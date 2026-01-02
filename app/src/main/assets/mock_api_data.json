@@ -1,0 +1,585 @@
+{
+  "users": [
+    {
+      "id": "user_001",
+      "name": "Alice Cooper",
+      "email": "alice.cooper@email.com",
+      "abilityCategory": "Blind",
+      "accessibilityProfile": {
+        "screenReaderEnabled": true,
+        "highContrastEnabled": true,
+        "largeTextEnabled": true,
+        "voiceControlEnabled": true,
+        "hapticFeedbackEnabled": false,
+        "brailleDisplayConnected": false,
+        "notes": "Primary communication via VoiceOver. Requires audio descriptions for visual information. Emergency alerts must include voice synthesis."
+      },
+      "lastKnownLocation": {
+        "lat": 40.7128,
+        "lng": -74.0060,
+        "lastUpdated": "2024-01-15T10:35:00Z"
+      },
+      "batteryLevel": 23,
+      "currentStatus": "SOS"
+    },
+    {
+      "id": "user_002",
+      "name": "David Miller",
+      "email": "david.miller@email.com",
+      "abilityCategory": "Deaf",
+      "accessibilityProfile": {
+        "screenReaderEnabled": false,
+        "highContrastEnabled": false,
+        "largeTextEnabled": true,
+        "voiceControlEnabled": false,
+        "hapticFeedbackEnabled": true,
+        "brailleDisplayConnected": false,
+        "notes": "Relies on visual alerts and vibration patterns. Cannot hear sirens or audio notifications. Prefers text-based communication."
+      },
+      "lastKnownLocation": {
+        "lat": 40.7589,
+        "lng": -73.9851,
+        "lastUpdated": "2024-01-15T09:50:00Z"
+      },
+      "batteryLevel": 67,
+      "currentStatus": "Injured"
+    },
+    {
+      "id": "user_003",
+      "name": "Sophie Chen",
+      "email": "sophie.chen@email.com",
+      "abilityCategory": "Elderly",
+      "accessibilityProfile": {
+        "screenReaderEnabled": false,
+        "highContrastEnabled": true,
+        "largeTextEnabled": true,
+        "voiceControlEnabled": true,
+        "hapticFeedbackEnabled": true,
+        "brailleDisplayConnected": false,
+        "notes": "Mobility limitations. Uses walking aid. Prefers large buttons and simplified interface. May need assistance with evacuation."
+      },
+      "lastKnownLocation": {
+        "lat": 40.7505,
+        "lng": -73.9934,
+        "lastUpdated": "2024-01-15T08:20:00Z"
+      },
+      "batteryLevel": 45,
+      "currentStatus": "Safe"
+    },
+    {
+      "id": "user_004",
+      "name": "Marcus Thorne",
+      "email": "marcus.thorne@email.com",
+      "abilityCategory": "Normal",
+      "accessibilityProfile": {
+        "screenReaderEnabled": false,
+        "highContrastEnabled": false,
+        "largeTextEnabled": false,
+        "voiceControlEnabled": false,
+        "hapticFeedbackEnabled": true,
+        "brailleDisplayConnected": false,
+        "notes": "No accessibility requirements. Standard interface preferred."
+      },
+      "lastKnownLocation": {
+        "lat": 40.7282,
+        "lng": -73.9942,
+        "lastUpdated": "2024-01-15T07:35:00Z"
+      },
+      "batteryLevel": 89,
+      "currentStatus": "Safe"
+    },
+    {
+      "id": "user_005",
+      "name": "Isabella Rodriguez",
+      "email": "isabella.rodriguez@email.com",
+      "abilityCategory": "Non-Verbal",
+      "accessibilityProfile": {
+        "screenReaderEnabled": false,
+        "highContrastEnabled": true,
+        "largeTextEnabled": true,
+        "voiceControlEnabled": true,
+        "hapticFeedbackEnabled": true,
+        "brailleDisplayConnected": false,
+        "notes": "Non-verbal communicator. Uses AAC app for communication. Emergency button accessible via single tap or voice command."
+      },
+      "lastKnownLocation": {
+        "lat": 40.7614,
+        "lng": -73.9776,
+        "lastUpdated": "2024-01-15T11:05:00Z"
+      },
+      "batteryLevel": 34,
+      "currentStatus": "SOS"
+    },
+    {
+      "id": "user_006",
+      "name": "James Wilson",
+      "email": "james.wilson@email.com",
+      "abilityCategory": "Blind",
+      "accessibilityProfile": {
+        "screenReaderEnabled": true,
+        "highContrastEnabled": true,
+        "largeTextEnabled": true,
+        "voiceControlEnabled": true,
+        "hapticFeedbackEnabled": true,
+        "brailleDisplayConnected": true,
+        "notes": "Tech-savvy blind user. Uses refreshable braille display. Can navigate independently with GPS audio guidance."
+      },
+      "lastKnownLocation": {
+        "lat": 40.7831,
+        "lng": -73.9712,
+        "lastUpdated": "2024-01-15T10:55:00Z"
+      },
+      "batteryLevel": 78,
+      "currentStatus": "Safe"
+    },
+    {
+      "id": "user_007",
+      "name": "Emma Thompson",
+      "email": "emma.thompson@email.com",
+      "abilityCategory": "Deaf",
+      "accessibilityProfile": {
+        "screenReaderEnabled": false,
+        "highContrastEnabled": true,
+        "largeTextEnabled": true,
+        "voiceControlEnabled": false,
+        "hapticFeedbackEnabled": true,
+        "brailleDisplayConnected": false,
+        "notes": "Deaf since birth. Uses American Sign Language primarily. Requires visual strobe lights for alarms."
+      },
+      "lastKnownLocation": {
+        "lat": 40.7489,
+        "lng": -73.9680,
+        "lastUpdated": "2024-01-15T09:15:00Z"
+      },
+      "batteryLevel": 52,
+      "currentStatus": "Missing"
+    },
+    {
+      "id": "user_008",
+      "name": "Robert Martinez",
+      "email": "robert.martinez@email.com",
+      "abilityCategory": "Elderly",
+      "accessibilityProfile": {
+        "screenReaderEnabled": false,
+        "highContrastEnabled": true,
+        "largeTextEnabled": true,
+        "voiceControlEnabled": true,
+        "hapticFeedbackEnabled": true,
+        "brailleDisplayConnected": false,
+        "notes": "Elderly with early-stage dementia. Lives alone. Has medical alert necklace. Caregiver notified for all alerts."
+      },
+      "lastKnownLocation": {
+        "lat": 40.7195,
+        "lng": -74.0069,
+        "lastUpdated": "2024-01-15T06:45:00Z"
+      },
+      "batteryLevel": 15,
+      "currentStatus": "Injured"
+    },
+    {
+      "id": "user_009",
+      "name": "Nina Patel",
+      "email": "nina.patel@email.com",
+      "abilityCategory": "Non-Verbal",
+      "accessibilityProfile": {
+        "screenReaderEnabled": false,
+        "highContrastEnabled": false,
+        "largeTextEnabled": true,
+        "voiceControlEnabled": true,
+        "hapticFeedbackEnabled": true,
+        "brailleDisplayConnected": false,
+        "notes": "Non-verbal due to autism spectrum disorder. Uses picture-based communication. Sensitive to loud sounds."
+      },
+      "lastKnownLocation": {
+        "lat": 40.7359,
+        "lng": -73.9904,
+        "lastUpdated": "2024-01-15T10:20:00Z"
+      },
+      "batteryLevel": 91,
+      "currentStatus": "Safe"
+    },
+    {
+      "id": "user_010",
+      "name": "William Chen",
+      "email": "william.chen@email.com",
+      "abilityCategory": "Normal",
+      "accessibilityProfile": {
+        "screenReaderEnabled": false,
+        "highContrastEnabled": false,
+        "largeTextEnabled": false,
+        "voiceControlEnabled": false,
+        "hapticFeedbackEnabled": true,
+        "brailleDisplayConnected": false,
+        "notes": "No accessibility requirements. First responder volunteer."
+      },
+      "lastKnownLocation": {
+        "lat": 40.7580,
+        "lng": -73.9855,
+        "lastUpdated": "2024-01-15T11:10:00Z"
+      },
+      "batteryLevel": 62,
+      "currentStatus": "Safe"
+    }
+  ],
+  "sosAlerts": [
+    {
+      "id": "sos_001",
+      "userId": "user_001",
+      "userName": "Alice Cooper",
+      "alertType": "SOS",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "description": "Emergency SOS triggered by voice command. User trapped in building collapse. VoiceOver user needs audio guidance for evacuation.",
+      "status": "Active",
+      "batteryLevel": 23,
+      "riskScore": 85,
+      "location": {
+        "lat": 40.7128,
+        "lng": -74.0060,
+        "address": "123 Main St, New York, NY 10001"
+      }
+    },
+    {
+      "id": "sos_002",
+      "userId": "user_002",
+      "userName": "David Miller",
+      "alertType": "Injured",
+      "timestamp": "2024-01-15T09:45:00Z",
+      "description": "User reported injury during earthquake. Cannot hear emergency sirens. Requires visual notification methods.",
+      "status": "Active",
+      "batteryLevel": 67,
+      "riskScore": 72,
+      "location": {
+        "lat": 40.7589,
+        "lng": -73.9851,
+        "address": "456 Broadway, New York, NY 10013"
+      }
+    },
+    {
+      "id": "sos_003",
+      "userId": "user_003",
+      "userName": "Sophie Chen",
+      "alertType": "Trapped",
+      "timestamp": "2024-01-15T08:15:00Z",
+      "description": "Elderly user trapped in elevator during power outage. Mobility issues, uses walking aid.",
+      "status": "Resolved",
+      "batteryLevel": 45,
+      "riskScore": 91,
+      "location": {
+        "lat": 40.7505,
+        "lng": -73.9934,
+        "address": "789 5th Ave, New York, NY 10022"
+      }
+    },
+    {
+      "id": "sos_004",
+      "userId": "user_005",
+      "userName": "Isabella Rodriguez",
+      "alertType": "Medical",
+      "timestamp": "2024-01-15T11:00:00Z",
+      "description": "Medical emergency triggered by one-tap button. User is non-verbal. Needs immediate medical attention.",
+      "status": "Active",
+      "batteryLevel": 34,
+      "riskScore": 78,
+      "location": {
+        "lat": 40.7614,
+        "lng": -73.9776,
+        "address": "654 Lexington Ave, New York, NY 10065"
+      }
+    },
+    {
+      "id": "sos_005",
+      "userId": "user_007",
+      "userName": "Emma Thompson",
+      "alertType": "SOS",
+      "timestamp": "2024-01-15T10:45:00Z",
+      "description": "Silent SOS activated via专用 app gesture. Deaf user in area with active fire. Last seen near fire zone.",
+      "status": "Pending",
+      "batteryLevel": 52,
+      "riskScore": 88,
+      "location": {
+        "lat": 40.7489,
+        "lng": -73.9680,
+        "address": "321 Park Ave, New York, NY 10022"
+      }
+    },
+    {
+      "id": "sos_006",
+      "userId": "user_008",
+      "userName": "Robert Martinez",
+      "alertType": "Injured",
+      "timestamp": "2024-01-15T07:30:00Z",
+      "description": "Fall detection alert triggered. Elderly user with dementia. Unable to get up independently.",
+      "status": "Active",
+      "batteryLevel": 15,
+      "riskScore": 65,
+      "location": {
+        "lat": 40.7195,
+        "lng": -74.0069,
+        "address": "567 Canal St, New York, NY 10013"
+      }
+    },
+    {
+      "id": "sos_007",
+      "userId": "user_004",
+      "userName": "Marcus Thorne",
+      "alertType": "Safe",
+      "timestamp": "2024-01-15T07:30:00Z",
+      "description": "User confirmed safe after evacuating to designated shelter. Reporting conditions from shelter.",
+      "status": "Resolved",
+      "batteryLevel": 89,
+      "riskScore": 15,
+      "location": {
+        "lat": 40.7282,
+        "lng": -73.9942,
+        "address": "321 West St, New York, NY 10014"
+      }
+    },
+    {
+      "id": "sos_008",
+      "userId": "user_001",
+      "userName": "Alice Cooper",
+      "alertType": "Trapped",
+      "timestamp": "2024-01-15T08:00:00Z",
+      "description": "Blind user unable to navigate debris. Requesting audio-guided evacuation assistance.",
+      "status": "Resolved",
+      "batteryLevel": 31,
+      "riskScore": 76,
+      "location": {
+        "lat": 40.7135,
+        "lng": -74.0055,
+        "address": "125 Main St, New York, NY 10001"
+      }
+    },
+    {
+      "id": "sos_009",
+      "userId": "user_006",
+      "userName": "James Wilson",
+      "alertType": "SOS",
+      "timestamp": "2024-01-15T11:05:00Z",
+      "description": "Braille display user reporting structural instability in adjacent building. Requesting immediate evacuation of area.",
+      "status": "Pending",
+      "batteryLevel": 78,
+      "riskScore": 82,
+      "location": {
+        "lat": 40.7831,
+        "lng": -73.9712,
+        "address": "100 Central Park West, New York, NY 10023"
+      }
+    },
+    {
+      "id": "sos_010",
+      "userId": "user_002",
+      "userName": "David Miller",
+      "alertType": "Trapped",
+      "timestamp": "2024-01-15T08:45:00Z",
+      "description": "Deaf user trapped in collapsed area. Can only communicate via text. Visual signals not working.",
+      "status": "Resolved",
+      "batteryLevel": 59,
+      "riskScore": 94,
+      "location": {
+        "lat": 40.7595,
+        "lng": -73.9845,
+        "address": "460 Broadway, New York, NY 10013"
+      }
+    }
+  ],
+  "incidents": [
+    {
+      "id": "incident_001",
+      "title": "Building Collapse - Midtown",
+      "type": "structural",
+      "severity": "Critical",
+      "reporter": "Alice Cooper",
+      "reporterId": "user_001",
+      "affectedPeople": 12,
+      "vulnerableCount": 4,
+      "updates": [
+        {
+          "timestamp": "2024-01-15T10:30:00Z",
+          "message": "Initial report of partial building collapse. Multiple individuals trapped including elderly and disabled residents."
+        },
+        {
+          "timestamp": "2024-01-15T10:45:00Z",
+          "message": "Fire department on scene. Structural assessment ongoing. Search and rescue operations initiated."
+        },
+        {
+          "timestamp": "2024-01-15T11:00:00Z",
+          "message": "First victim rescued. Searching for additional survivors. Special equipment requested for blind resident extraction."
+        },
+        {
+          "timestamp": "2024-01-15T11:30:00Z",
+          "message": "Second victim rescued. Three more confirmed trapped. Rescue dogs being deployed."
+        }
+      ]
+    },
+    {
+      "id": "incident_002",
+      "title": "Earthquake Damage - Downtown",
+      "type": "earthquake",
+      "severity": "Critical",
+      "reporter": "David Miller",
+      "reporterId": "user_002",
+      "affectedPeople": 45,
+      "vulnerableCount": 8,
+      "updates": [
+        {
+          "timestamp": "2024-01-15T09:45:00Z",
+          "message": "Magnitude 6.2 earthquake reported. Multiple buildings damaged in downtown area."
+        },
+        {
+          "timestamp": "2024-01-15T10:00:00Z",
+          "message": "Aftershock detected. Evacuations in progress. Emergency services responding."
+        },
+        {
+          "timestamp": "2024-01-15T10:30:00Z",
+          "message": "Shelter opened at Community Center. ASL interpreters on site for deaf community."
+        },
+        {
+          "timestamp": "2024-01-15T11:00:00Z",
+          "message": "Three buildings showing structural instability. Road closures in effect. Power outages reported."
+        }
+      ]
+    },
+    {
+      "id": "incident_003",
+      "title": "Flooding - Lower East Side",
+      "type": "flood",
+      "severity": "Medium",
+      "reporter": "System Alert",
+      "reporterId": "system",
+      "affectedPeople": 150,
+      "vulnerableCount": 12,
+      "updates": [
+        {
+          "timestamp": "2024-01-15T08:00:00Z",
+          "message": "Heavy rainfall causing street flooding in Lower East Side. Public works responding."
+        },
+        {
+          "timestamp": "2024-01-15T08:30:00Z",
+          "message": "Drainage systems working. Water levels receding. Advisory in effect."
+        },
+        {
+          "timestamp": "2024-01-15T09:00:00Z",
+          "message": "Flood warning extended. Residents near river advised to move to higher ground."
+        }
+      ]
+    },
+    {
+      "id": "incident_004",
+      "title": "Fire - Midtown High-Rise",
+      "type": "fire",
+      "severity": "High",
+      "reporter": "Isabella Rodriguez",
+      "reporterId": "user_005",
+      "affectedPeople": 85,
+      "vulnerableCount": 15,
+      "updates": [
+        {
+          "timestamp": "2024-01-15T10:55:00Z",
+          "message": "Fire reported on 12th floor of 20-story residential building. Full evacuation ordered."
+        },
+        {
+          "timestamp": "2024-01-15T11:05:00Z",
+          "message": "Fire department on scene. Aerial ladders deployed. Elderly and disabled residents being prioritized."
+        },
+        {
+          "timestamp": "2024-01-15T11:20:00Z",
+          "message": "Fire contained to one floor. Evacuation 80% complete. Search continuing for missing residents."
+        }
+      ]
+    },
+    {
+      "id": "incident_005",
+      "title": "Structural Damage - Brooklyn Bridge",
+      "type": "structural",
+      "severity": "High",
+      "reporter": "Marcus Thorne",
+      "reporterId": "user_004",
+      "affectedPeople": 200,
+      "vulnerableCount": 18,
+      "updates": [
+        {
+          "timestamp": "2024-01-15T09:00:00Z",
+          "message": "Cracks discovered on Brooklyn Bridge support structure. Traffic being diverted."
+        },
+        {
+          "timestamp": "2024-01-15T09:30:00Z",
+          "message": "Structural engineers on site. Assessment ongoing. Bridge partially closed."
+        },
+        {
+          "timestamp": "2024-01-15T10:15:00Z",
+          "message": "Emergency repairs initiated. Commuters advised to use alternate routes. Shuttle buses arranged."
+        }
+      ]
+    },
+    {
+      "id": "incident_006",
+      "title": "Gas Leak - West Village",
+      "type": "structural",
+      "severity": "High",
+      "reporter": "System Alert",
+      "reporterId": "system",
+      "affectedPeople": 50,
+      "vulnerableCount": 6,
+      "updates": [
+        {
+          "timestamp": "2024-01-15T10:20:00Z",
+          "message": "Gas leak detected in West Village. Building evacuation in progress."
+        },
+        {
+          "timestamp": "2024-01-15T10:40:00Z",
+          "message": "Gas company on scene. Main valve being shut off. Area cordoned off."
+        },
+        {
+          "timestamp": "2024-01-15T11:10:00Z",
+          "message": "Leak contained. Residents can return to buildings after inspection. Individual units being cleared."
+        }
+      ]
+    },
+    {
+      "id": "incident_007",
+      "title": "River Flooding - Harlem",
+      "type": "flood",
+      "severity": "Low",
+      "reporter": "System Alert",
+      "reporterId": "system",
+      "affectedPeople": 75,
+      "vulnerableCount": 9,
+      "updates": [
+        {
+          "timestamp": "2024-01-15T07:00:00Z",
+          "message": "Minor flooding along Harlem River. Low-lying areas affected."
+        },
+        {
+          "timestamp": "2024-01-15T09:00:00Z",
+          "message": "Water levels stabilizing. No immediate danger. Advisory issued for affected streets."
+        }
+      ]
+    },
+    {
+      "id": "incident_008",
+      "title": "Fire - Chinatown Restaurant",
+      "type": "fire",
+      "severity": "Medium",
+      "reporter": "William Chen",
+      "reporterId": "user_010",
+      "affectedPeople": 25,
+      "vulnerableCount": 3,
+      "updates": [
+        {
+          "timestamp": "2024-01-15T10:00:00Z",
+          "message": "Kitchen fire reported in restaurant. Fire sprinklers activated."
+        },
+        {
+          "timestamp": "2024-01-15T10:15:00Z",
+          "message": "Fire extinguished. Building being ventilated. Minor damage reported."
+        },
+        {
+          "timestamp": "2024-01-15T10:45:00Z",
+          "message": "Building cleared for re-entry. Business operations suspended for inspection."
+        }
+      ]
+    }
+  ]
+}
+
