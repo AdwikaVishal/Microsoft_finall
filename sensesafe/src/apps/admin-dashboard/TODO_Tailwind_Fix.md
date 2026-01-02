@@ -15,5 +15,5 @@ The Tailwind CSS PostCSS plugin has been moved to a separate package. Need to up
 - [x] Change `@tailwind` directives to `@import "tailwindcss";`
 
 ### 4. Test the fix
-- [ ] Run dev server to verify the fix works
+- [x] Run dev server to verify the fix works
 

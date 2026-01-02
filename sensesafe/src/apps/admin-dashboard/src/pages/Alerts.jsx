@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import AlertCard from '../components/AlertCard';
 import VulnerableBadge from '../components/VulnerableBadge';
-import { getSOS, getIncidents } from '../../../../services/api.js';
+import { getAllAlertsForAdmin } from '../../../../services/api.js';
 
 function Alerts({ alerts: initialAlerts, newAlertId }) {
   const [alerts, setAlerts] = useState(initialAlerts || []);
@@ -48,7 +48,7 @@ function Alerts({ alerts: initialAlerts, newAlertId }) {
 
     // Category filter
     if (categoryFilter !== 'all') {
-      filtered = filtered.filter(alert => alert.userCategory.toLowerCase() === categoryFilter.toLowerCase());
+      filtered = filtered.filter(alert => (alert.userCategory || '').toLowerCase() === categoryFilter.toLowerCase());
     }
 
     // Sort
@@ -73,25 +73,32 @@ function Alerts({ alerts: initialAlerts, newAlertId }) {
   const handleRefresh = async () => {
     setIsLoading(true);
     try {
-      const [sosData, incidentsData] = await Promise.all([
-        getSOS(),
-        getIncidents()
-      ]);
+      console.log('🔄 Refreshing alerts...');
       
-      // Combine SOS alerts with incident data
-      const combinedAlerts = [...sosData, ...incidentsData.map(inc => ({
-        id: inc.id,
-        userName: inc.reporter,
-        alertType: inc.type,
-        userCategory: 'Normal',
-        isVulnerable: false,
-        timestamp: inc.timestamp,
-        status: inc.status,
-        description: inc.description,
-        riskScore: Math.floor(Math.random() * 100)
-      }))];
+      // Use the combined fetch function that gets data from /api/sos/user and /api/incidents/user
+      const data = await getAllAlertsForAdmin();
+      
+      // Convert to alert format
+      const messagesList = data.messages || [];
+      const combinedAlerts = messagesList.map(msg => ({
+        id: msg.id,
+        userName: msg.user_name || 'Unknown User',
+        alertType: msg.message_type === 'SOS' ? 'SOS Alert' : msg.message_type === 'INCIDENT' ? 'Incident' : 'Message',
+        userCategory: msg.ability || msg.category || 'Normal',
+        isVulnerable: msg.ability && msg.ability !== 'NONE',
+        timestamp: msg.created_at,
+        status: msg.is_read ? 'Resolved' : 'Active',
+        description: msg.content || msg.title,
+        riskScore: msg.severity === 'critical' ? 95 : msg.severity === 'high' ? 75 : msg.severity === 'medium' ? 50 : 25,
+        location: msg.lat && msg.lng ? `${msg.lat.toFixed(4)}, ${msg.lng.toFixed(4)}` : null,
+        category: msg.category,
+        severity: msg.severity,
+        ability: msg.ability,
+        battery: msg.battery,
+      }));
       
       setAlerts(combinedAlerts);
+      console.log(`✅ Refreshed ${combinedAlerts.length} alerts`);
     } catch (error) {
       console.error('Error refreshing alerts:', error);
     } finally {
@@ -251,7 +258,7 @@ function Alerts({ alerts: initialAlerts, newAlertId }) {
             <p className="mt-1 text-sm text-gray-500">
               {searchTerm || statusFilter !== 'all' || categoryFilter !== 'all' 
                 ? 'Try adjusting your filters' 
-                : 'No SOS alerts have been received yet'}
+                : 'No SOS alerts have been received yet. Alerts sent from the Android app will appear here.'}
             </p>
           </div>
         ) : (
@@ -338,3 +345,4 @@ function Alerts({ alerts: initialAlerts, newAlertId }) {
 }
 
 export default Alerts;
+

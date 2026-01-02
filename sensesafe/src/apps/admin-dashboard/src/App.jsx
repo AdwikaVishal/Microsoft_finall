@@ -9,7 +9,7 @@ import Login from './pages/Login';
 import Users from './pages/Users';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
-import { getAllMessages, getMessageStats, getSystemHealth } from '../../../services/api.js';
+import { getAllAlertsForAdmin, getMessageStats, getSystemHealth } from '../../../services/api.js';
 
 function App() {
   const [alerts, setAlerts] = useState([]);
@@ -25,12 +25,16 @@ function App() {
     return !!localStorage.getItem('token');
   });
 
-  // Fetch real data from backend
+  // Fetch real data from backend - includes SOS and incidents from their native endpoints
+  // This ensures data sent from Android app via /api/sos and /api/incidents is visible
   const fetchData = useCallback(async () => {
     try {
-      // Fetch messages (which includes SOS and incidents)
-      const messagesData = await getAllMessages({ page_size: 100 });
-      const messagesList = messagesData.messages || [];
+      console.log('🔄 Fetching alerts from backend...');
+      
+      // Fetch from combined endpoint (fetches from /api/sos/user, /api/incidents/user, and /api/messages/admin/all)
+      const data = await getAllAlertsForAdmin();
+      
+      const messagesList = data.messages || [];
       setMessages(messagesList);
 
       // Convert messages to alerts format for Dashboard/Alerts pages
@@ -38,11 +42,11 @@ function App() {
         id: msg.id,
         userName: msg.user_name || 'Unknown User',
         alertType: msg.message_type === 'SOS' ? 'SOS Alert' : msg.message_type === 'INCIDENT' ? 'Incident' : 'Message',
-        userCategory: msg.ability || 'Normal',
+        userCategory: msg.ability || msg.category || 'Normal',
         isVulnerable: msg.ability && msg.ability !== 'NONE',
         timestamp: msg.created_at,
         status: msg.is_read ? 'Resolved' : 'Active',
-        description: msg.content,
+        description: msg.content || msg.title,
         riskScore: msg.severity === 'critical' ? 95 : msg.severity === 'high' ? 75 : msg.severity === 'medium' ? 50 : 25,
         location: msg.lat && msg.lng ? `${msg.lat.toFixed(4)}, ${msg.lng.toFixed(4)}` : null,
         category: msg.category,
@@ -50,22 +54,23 @@ function App() {
         ability: msg.ability,
         battery: msg.battery,
       }));
+      
       setAlerts(alertsList);
+      console.log(`✅ Loaded ${alertsList.length} alerts from backend`);
 
-      // Fetch stats
-      const statsData = await getMessageStats();
+      // Use stats from combined data
       setStats({
-        total: statsData.total || messagesList.length,
-        unread: statsData.unread || messagesList.filter(m => !m.is_read).length,
-        by_type: statsData.by_type || {
-          SOS: messagesList.filter(m => m.message_type === 'SOS').length,
-          INCIDENT: messagesList.filter(m => m.message_type === 'INCIDENT').length,
-          GENERAL: messagesList.filter(m => m.message_type === 'GENERAL').length,
+        total: data.stats.total || alertsList.length,
+        unread: data.stats.unread || alertsList.filter(m => !m.is_read).length,
+        by_type: data.stats.by_type || {
+          SOS: alertsList.filter(m => m.alertType === 'SOS Alert').length,
+          INCIDENT: alertsList.filter(m => m.alertType === 'Incident').length,
+          GENERAL: alertsList.filter(m => m.alertType === 'Message').length,
         }
       });
 
     } catch (error) {
-      console.error('Error fetching data from backend:', error);
+      console.error('❌ Error fetching data from backend:', error);
       // Keep using empty data if backend is not available
     } finally {
       setIsLoading(false);
@@ -84,8 +89,9 @@ function App() {
     if (!isLoggedIn) return;
 
     const interval = setInterval(() => {
+      console.log('🔄 Periodic refresh...');
       fetchData();
-    }, 30000); // Refresh every 30 seconds
+    }, 10000); // Refresh every 10 seconds for real-time updates
 
     return () => clearInterval(interval);
   }, [isLoggedIn, fetchData]);
@@ -112,6 +118,7 @@ function App() {
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
                   <p className="mt-4 text-gray-600">Loading data from backend...</p>
+                  <p className="mt-2 text-sm text-gray-500">Fetching SOS alerts and incidents...</p>
                 </div>
               </div>
             ) : (

@@ -1,13 +1,14 @@
-// API services for SenseSafe frontend
-// Connected to FastAPI backend
+/**
+ * SenseSafe API Service
+ * Connected to FastAPI backend via Vite proxy
+ */
 
 import axios from 'axios';
 
-// Configure axios base settings
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-
+// Use relative URLs when running behind Vite proxy
+// The proxy in vite.admin.config.js forwards /api/* to http://10.82.205.229:8000
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: '',  // Use relative URLs - proxy handles the rest
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -49,7 +50,7 @@ const simulateError = (probability = 0) => {
 
 /**
  * Authenticate user
- * @param {Object} credentials - Login credentials
+ * @param {Object} credentials - Login credentials {email, password}
  * @returns {Promise<Object>} Authentication response
  */
 export const authenticateUser = async (credentials) => {
@@ -74,7 +75,7 @@ export const authenticateUser = async (credentials) => {
 
 /**
  * Register new user
- * @param {Object} userData - User registration data
+ * @param {Object} userData - User registration data {name, email, password, role, ability}
  * @returns {Promise<Object>} Registration response
  */
 export const registerUser = async (userData) => {
@@ -103,11 +104,11 @@ export const getCurrentUser = async () => {
   }
 };
 
-// ==================== SOS ALERTS (User → Backend → Admin) ====================
+// ==================== SOS ALERTS ====================
 
 /**
  * Send SOS alert to backend
- * @param {Object} sosData - SOS alert data
+ * @param {Object} sosData - SOS alert data {ability, lat, lng, battery, status}
  * @returns {Promise<Object>} Created SOS alert
  */
 export const sendSOS = async (sosData) => {
@@ -115,13 +116,12 @@ export const sendSOS = async (sosData) => {
   
   try {
     console.log('📡 Sending SOS to backend:', sosData);
-    const response = await apiClient.post('/api/messages/sos', {
-      title: sosData.title || 'SOS Emergency Alert',
-      content: sosData.content || 'Emergency SOS alert',
+    const response = await apiClient.post('/api/sos', {
       ability: sosData.ability || 'NONE',
       lat: sosData.lat,
       lng: sosData.lng,
       battery: sosData.battery || 100,
+      status: sosData.status || 'NEED_HELP',
     });
     console.log('✅ SOS sent successfully:', response.data);
     return {
@@ -141,19 +141,43 @@ export const sendSOS = async (sosData) => {
  */
 export const getUserSOSAlerts = async () => {
   try {
-    const response = await apiClient.get('/api/messages?message_type=SOS');
-    return response.data.messages || [];
+    const response = await apiClient.get('/api/sos/user');
+    return response.data.sos_alerts || [];
   } catch (error) {
     console.error('Get SOS alerts error:', error);
     throw error;
   }
 };
 
-// ==================== INCIDENTS (User → Backend → Admin) ====================
+/**
+ * Get all SOS alerts (admin)
+ * @returns {Promise<Array>} List of all SOS alerts
+ */
+export const getAllSOSAlerts = async () => {
+  try {
+    // Try to get from messages first (unified endpoint)
+    const response = await apiClient.get('/api/messages/admin/all', {
+      params: { message_type: 'SOS', page_size: 100 }
+    });
+    return response.data.messages || [];
+  } catch (error) {
+    console.warn('Could not fetch SOS from messages, trying alternative...');
+    // Fallback: try direct sos endpoint if available
+    try {
+      const response = await apiClient.get('/api/sos/user');
+      return response.data.sos_alerts || [];
+    } catch (e) {
+      console.warn('No SOS data available');
+      return [];
+    }
+  }
+};
+
+// ==================== INCIDENTS ====================
 
 /**
  * Send incident report to backend
- * @param {Object} incidentData - Incident report data
+ * @param {Object} incidentData - Incident report data {title, content, category, severity, lat, lng, image_url}
  * @returns {Promise<Object>} Created incident
  */
 export const sendIncident = async (incidentData) => {
@@ -161,7 +185,7 @@ export const sendIncident = async (incidentData) => {
   
   try {
     console.log('📡 Sending incident to backend:', incidentData);
-    const response = await apiClient.post('/api/messages/incident', {
+    const response = await apiClient.post('/api/incidents', {
       title: incidentData.title || `Incident Report: ${incidentData.category}`,
       content: incidentData.content,
       category: incidentData.category,
@@ -188,15 +212,194 @@ export const sendIncident = async (incidentData) => {
  */
 export const getUserIncidents = async () => {
   try {
-    const response = await apiClient.get('/api/messages?message_type=INCIDENT');
-    return response.data.messages || [];
+    const response = await apiClient.get('/api/incidents/user');
+    return response.data.incidents || [];
   } catch (error) {
     console.error('Get incidents error:', error);
     throw error;
   }
 };
 
-// ==================== ADMIN DASHBOARD ====================
+/**
+ * Get incident by ID
+ * @param {string} incidentId - Incident ID
+ * @returns {Promise<Object>} Incident details
+ */
+export const getIncidentById = async (incidentId) => {
+  try {
+    const response = await apiClient.get(`/api/incidents/${incidentId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Get incident error:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get all incidents (admin)
+ * @param {Object} params - Query parameters {page, page_size, status_filter}
+ * @returns {Promise<Object>} Paginated list of incidents
+ */
+export const getAdminIncidents = async (params = {}) => {
+  try {
+    const response = await apiClient.get('/api/admin/incidents', {
+      params: {
+        page: params.page || 1,
+        page_size: params.page_size || 100,
+        status_filter: params.status_filter || null,
+      },
+    });
+    return response.data.incidents || [];
+  } catch (error) {
+    console.error('Get admin incidents error:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get all incidents from incidents endpoint (bypasses messages table)
+ * This is the key function to fetch incidents sent from Android app
+ * @returns {Promise<Array>} List of all incidents
+ */
+export const getAllIncidentsDirect = async () => {
+  try {
+    const response = await apiClient.get('/api/incidents/user');
+    return response.data.incidents || [];
+  } catch (error) {
+    console.warn('Could not fetch incidents directly:', error.message);
+    // Try admin endpoint as fallback
+    try {
+      const response = await apiClient.get('/api/admin/incidents', {
+        params: { page_size: 100 }
+      });
+      return response.data.incidents || [];
+    } catch (e) {
+      console.warn('No incidents available from admin endpoint either');
+      return [];
+    }
+  }
+};
+
+// ==================== DISASTER ALERTS ====================
+
+/**
+ * Get all disaster alerts
+ * @param {Object} params - Query parameters {page, page_size}
+ * @returns {Promise<Object>} Paginated list of alerts
+ */
+export const getAlerts = async (params = {}) => {
+  try {
+    const response = await apiClient.get('/api/alerts', {
+      params: {
+        page: params.page || 1,
+        page_size: params.page_size || 20,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Get alerts error:', error);
+    throw error;
+  }
+};
+
+// ==================== ADMIN DASHBOARD - COMBINED FETCH ====================
+
+/**
+ * Get all alerts for admin dashboard (combines SOS, incidents from their native endpoints)
+ * This ensures data sent from Android app via /api/sos and /api/incidents is visible
+ * @returns {Promise<Object>} Object containing all alerts { sosAlerts, incidents, stats }
+ */
+export const getAllAlertsForAdmin = async () => {
+  try {
+    console.log('🔄 Fetching all alerts from backend...');
+    
+    // Fetch from multiple sources in parallel
+    const [sosResponse, incidentsResponse, messagesResponse] = await Promise.allSettled([
+      // Try getting SOS from native endpoint
+      apiClient.get('/api/sos/user').catch(() => ({ data: { sos_alerts: [] } })),
+      // Get incidents from native endpoint (where Android app sends data)
+      apiClient.get('/api/incidents/user').catch(() => ({ data: { incidents: [] } })),
+      // Also try messages endpoint as backup
+      apiClient.get('/api/messages/admin/all', { 
+        params: { page_size: 100 } 
+      }).catch(() => ({ data: { messages: [] } }))
+    ]);
+
+    const sosAlerts = sosResponse.value?.data?.sos_alerts || [];
+    const incidents = incidentsResponse.value?.data?.incidents || [];
+    const messages = messagesResponse.value?.data?.messages || [];
+
+    console.log(`📊 Raw data - SOS: ${sosAlerts.length}, Incidents: ${incidents.length}, Messages: ${messages.length}`);
+
+    // Convert SOS alerts to unified format
+    const formattedSOS = sosAlerts.map(sos => ({
+      id: sos.id,
+      message_type: 'SOS',
+      user_name: sos.user_name || 'Unknown User',
+      title: sos.title || 'SOS Alert',
+      content: sos.content || 'Emergency SOS alert',
+      ability: sos.ability || 'NONE',
+      battery: sos.battery,
+      lat: sos.lat,
+      lng: sos.lng,
+      severity: 'critical',
+      is_read: false,
+      created_at: sos.created_at || new Date().toISOString(),
+      status: sos.status
+    }));
+
+    // Convert incidents to unified format (key for Android-sent data)
+    const formattedIncidents = incidents.map(inc => ({
+      id: inc.id,
+      message_type: 'INCIDENT',
+      user_name: inc.reporter_name || 'Unknown User',
+      title: inc.title,
+      content: inc.description || inc.content,
+      category: inc.category,
+      severity: inc.severity || 'medium',
+      lat: inc.lat,
+      lng: inc.lng,
+      is_read: false,
+      created_at: inc.created_at || new Date().toISOString(),
+      status: inc.status,
+      image_url: inc.image_url
+    }));
+
+    // Use messages if available, otherwise use formatted native data
+    let allMessages = [];
+    if (messages.length > 0) {
+      allMessages = messages;
+    } else {
+      // Combine SOS and incidents from native endpoints
+      allMessages = [...formattedSOS, ...formattedIncidents];
+    }
+
+    // Calculate stats
+    const stats = {
+      total: allMessages.length,
+      unread: allMessages.filter(m => !m.is_read).length,
+      sos_count: allMessages.filter(m => m.message_type === 'SOS').length,
+      incident_count: allMessages.filter(m => m.message_type === 'INCIDENT').length,
+      by_type: {
+        SOS: allMessages.filter(m => m.message_type === 'SOS').length,
+        INCIDENT: allMessages.filter(m => m.message_type === 'INCIDENT').length,
+        GENERAL: allMessages.filter(m => m.message_type === 'GENERAL').length,
+      }
+    };
+
+    console.log(`✅ Total alerts: ${allMessages.length}`);
+    
+    return {
+      messages: allMessages,
+      sos_alerts: formattedSOS,
+      incidents: formattedIncidents,
+      stats
+    };
+  } catch (error) {
+    console.error('Error fetching all alerts for admin:', error);
+    throw error;
+  }
+};
 
 /**
  * Get all messages from all users (Admin only)
@@ -221,34 +424,6 @@ export const getAllMessages = async (params = {}) => {
 };
 
 /**
- * Get all SOS alerts from all users (Admin only)
- * @returns {Promise<Array>} List of all SOS alerts
- */
-export const getAllSOSAlerts = async () => {
-  try {
-    const response = await getAllMessages({ message_type: 'SOS' });
-    return response.messages || [];
-  } catch (error) {
-    console.error('Get all SOS alerts error:', error);
-    throw error;
-  }
-};
-
-/**
- * Get all incident reports from all users (Admin only)
- * @returns {Promise<Array>} List of all incidents
- */
-export const getAllIncidents = async () => {
-  try {
-    const response = await getAllMessages({ message_type: 'INCIDENT' });
-    return response.messages || [];
-  } catch (error) {
-    console.error('Get all incidents error:', error);
-    throw error;
-  }
-};
-
-/**
  * Get message statistics for admin dashboard
  * @returns {Promise<Object>} Message statistics
  */
@@ -258,7 +433,8 @@ export const getMessageStats = async () => {
     return response.data;
   } catch (error) {
     console.error('Get message stats error:', error);
-    throw error;
+    // Return calculated stats from available data
+    return { total: 0, unread: 0 };
   }
 };
 
@@ -291,30 +467,93 @@ export const markMessageAsRead = async (messageId) => {
   }
 };
 
-// ==================== LEGACY FUNCTIONS (Still available for compatibility) ====================
+/**
+ * Verify incident (Admin only)
+ * @param {string} incidentId - Incident ID
+ * @returns {Promise<Object>} Updated incident
+ */
+export const verifyIncident = async (incidentId) => {
+  try {
+    const response = await apiClient.patch(`/api/admin/incidents/${incidentId}/verify`);
+    return response.data;
+  } catch (error) {
+    console.error('Verify incident error:', error);
+    throw error;
+  }
+};
 
 /**
- * Get all SOS alerts (legacy - uses admin endpoint)
+ * Resolve incident (Admin only)
+ * @param {string} incidentId - Incident ID
+ * @returns {Promise<Object>} Updated incident
+ */
+export const resolveIncident = async (incidentId) => {
+  try {
+    const response = await apiClient.patch(`/api/admin/incidents/${incidentId}/resolve`);
+    return response.data;
+  } catch (error) {
+    console.error('Resolve incident error:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update incident (Admin only)
+ * @param {string} incidentId - Incident ID
+ * @param {Object} updateData - Update data
+ * @returns {Promise<Object>} Updated incident
+ */
+export const updateIncident = async (incidentId, updateData) => {
+  try {
+    const response = await apiClient.patch(`/api/admin/incidents/${incidentId}`, updateData);
+    return response.data;
+  } catch (error) {
+    console.error('Update incident error:', error);
+    throw error;
+  }
+};
+
+/**
+ * Create disaster alert (Admin only)
+ * @param {Object} alertData - Alert data {title, message, severity}
+ * @returns {Promise<Object>} Created alert
+ */
+export const createDisasterAlert = async (alertData) => {
+  try {
+    const response = await apiClient.post('/api/admin/alerts', alertData);
+    return response.data;
+  } catch (error) {
+    console.error('Create disaster alert error:', error);
+    throw error;
+  }
+};
+
+// ==================== LEGACY FUNCTIONS ====================
+
+/**
+ * Get all SOS alerts (legacy)
  * @returns {Promise<Array>} Array of SOS alerts
  */
 export const getSOS = async () => {
   try {
     return await getAllSOSAlerts();
   } catch (error) {
-    // Fallback to empty array if backend not available
+    console.warn('Backend not available, returning empty array');
     return [];
   }
 };
 
 /**
- * Get all incidents (legacy - uses admin endpoint)
+ * Get all incidents (legacy)
  * @returns {Promise<Array>} Array of incidents
  */
 export const getIncidents = async () => {
   try {
-    return await getAllIncidents();
+    // This is the key fix - use direct endpoint that Android app uses
+    const response = await getAllIncidentsDirect();
+    return response;
   } catch (error) {
-    // Fallback to empty array if backend not available
+    console.warn('Backend not available, returning empty array');
     return [];
   }
 };
@@ -341,27 +580,6 @@ export const sendUserStatus = async (statusData) => {
 };
 
 /**
- * Update incident status
- * @param {Object} incidentData - Incident data to update
- * @returns {Promise<Object>} Response with updated incident
- */
-export const updateIncident = async (incidentData) => {
-  try {
-    // Legacy function - just return success
-    return {
-      success: true,
-      message: 'Incident updated successfully',
-      id: incidentData.id || `incident_${Date.now()}`,
-      data: incidentData,
-      timestamp: new Date().toISOString(),
-    };
-  } catch (error) {
-    console.error('Update incident error:', error);
-    throw error;
-  }
-};
-
-/**
  * Get user profile by ID
  * @param {string} userId - User ID
  * @returns {Promise<Object>} User profile
@@ -372,26 +590,11 @@ export const getUserProfile = async (userId) => {
     return response.data;
   } catch (error) {
     console.error('Get user profile error:', error);
-    throw error;
   }
 };
 
 /**
- * Send disaster alert to users (Admin only)
- * @param {Object} alertData - Alert data
- * @returns {Promise<Object>} Response
- */
-export const sendDisasterAlert = async (alertData) => {
-  try {
-    const response = await apiClient.post('/api/admin/alerts', alertData);
-    return response.data;
-  } catch (error) {
-    console.error('Send disaster alert error:', error);
     throw error;
-  }
-};
-
-/**
  * Get system health status
  * @returns {Promise<Object>} System health information
  */
