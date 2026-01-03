@@ -138,7 +138,6 @@ fun MainAppNavGraph(
             }
             CameraScreen(
                 profile = profile,
-                viewModel = scanViewModel,
                 onExitDetected = { result ->
                     // Navigate back with the detected result
                     navController.previousBackStackEntry?.savedStateHandle?.set("scanResult", result)

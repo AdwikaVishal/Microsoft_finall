@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -16,6 +19,23 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Load local.properties
+        val localProperties = Properties()
+        val localPropertiesFile = project.rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(FileInputStream(localPropertiesFile))
+        }
+
+        buildConfigField("String", "SPEECHTEXT_API_KEY", "\"${localProperties["SPEECHTEXT_API_KEY"] ?: ""}\"")
+        buildConfigField("String", "AZURE_KEY", "\"${localProperties["AZURE_KEY"] ?: ""}\"")
+        buildConfigField("String", "AZURE_ENDPOINT", "\"${localProperties["AZURE_ENDPOINT"] ?: ""}\"")
+        buildConfigField("String", "LIBRE_TRANSLATE_BASE_URL", "\"${localProperties["LIBRE_TRANSLATE_BASE_URL"] ?: ""}\"")
+        // 4 Model Roboflow API Keys
+        buildConfigField("String", "RF_WINDOWS_KEY", "\"${localProperties["RF_WINDOWS_KEY"] ?: ""}\"")
+        buildConfigField("String", "RF_DOOR_KEY", "\"${localProperties["RF_DOOR_KEY"] ?: ""}\"")
+        buildConfigField("String", "RF_HALL_KEY", "\"${localProperties["RF_HALL_KEY"] ?: ""}\"")
+        buildConfigField("String", "RF_STAIRS_KEY", "\"${localProperties["RF_STAIRS_KEY"] ?: ""}\"")
     }
 
     buildTypes {

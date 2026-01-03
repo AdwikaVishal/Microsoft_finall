@@ -1,21 +1,17 @@
 package com.example.myapplication.viewmodel
 
 import android.content.Context
-import android.content.Intent
-import android.os.Bundle
-import android.speech.RecognitionListener
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.accessibility.AccessibilityManager
+import com.example.myapplication.data.services.SpeechService
 import com.example.myapplication.model.SOSStatus
+import com.example.myapplication.utils.AudioRecorder
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 /**
  * VoiceViewModel - Manages voice command state and processing
@@ -98,12 +94,12 @@ class VoiceViewModel(
     // SPEECH RECOGNIZER
     // ============================================================
 
-    private val speechRecognizer: SpeechRecognizer? = try {
-        SpeechRecognizer.createSpeechRecognizer(context)
-    } catch (e: Exception) {
-        Log.e("VoiceViewModel", "SpeechRecognizer not available: ${e.message}")
-        null
-    }
+    // ============================================================
+    // SPEECH SERVICES
+    // ============================================================
+
+    private val speechService = SpeechService()
+    private val audioRecorder = AudioRecorder()
 
     // Navigation callbacks (set by the UI)
     var onNavigateToScan: (() -> Unit)? = null
@@ -153,118 +149,7 @@ class VoiceViewModel(
     // ============================================================
 
     init {
-        setupSpeechRecognizer()
-    }
-
-    /**
-     * Sets up the speech recognizer with aRecognitionListener
-     */
-    private fun setupSpeechRecognizer() {
-        speechRecognizer?.setRecognitionListener(object : RecognitionListener {
-            override fun onReadyForSpeech(params: Bundle?) {
-                Log.d("VoiceViewModel", "Ready for speech")
-                _listeningState.value = ListeningState.Listening
-                accessibilityManager?.speak("Listening. Say a command.")
-            }
-
-            override fun onBeginningOfSpeech() {
-                // User started speaking
-            }
-
-            override fun onRmsChanged(rmsdB: Float) {
-                // Audio level changed - could be used for visualization
-            }
-
-            override fun onBufferReceived(buffer: ByteArray?) {
-                // Audio buffer received
-            }
-
-            override fun onEndOfSpeech() {
-                Log.d("VoiceViewModel", "End of speech")
-                _listeningState.value = ListeningState.Processing
-            }
-
-            override fun onError(error: Int) {
-                Log.e("VoiceViewModel", "Speech error: $error")
-                _listeningState.value = ListeningState.Idle
-                
-                val errorMessage = when (error) {
-                    SpeechRecognizer.ERROR_NETWORK, 
-                    SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> {
-                        "No internet connection. Please check your network."
-                    }
-                    SpeechRecognizer.ERROR_NO_MATCH -> {
-                        "Could not understand. Please try again."
-                    }
-                    SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> {
-                        "No speech detected. Listening again..."
-                    }
-                    SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> {
-                        "Recognition service busy. Please wait."
-                    }
-                    SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> {
-                        "Microphone permission not granted."
-                    }
-                    else -> {
-                        "Speech recognition error. Please try again."
-                    }
-                }
-                
-                _lastError.value = errorMessage
-                
-                // Auto-restart for recoverable errors (timeout, no match)
-                val shouldAutoRestart = error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT || 
-                                       error == SpeechRecognizer.ERROR_NO_MATCH
-                
-                if (shouldAutoRestart && isAutoRestartEnabled && retryCount < maxRetries) {
-                    retryCount++
-                    Log.d("VoiceViewModel", "Auto-restarting listening (attempt $retryCount of $maxRetries)")
-                    // Announce and restart after short delay
-                    accessibilityManager?.speak(errorMessage)
-                    viewModelScope.launch {
-                        kotlinx.coroutines.delay(1500) // Wait 1.5 seconds before restart
-                        if (_listeningState.value == ListeningState.Idle) {
-                            restartListening()
-                        }
-                    }
-                } else if (retryCount >= maxRetries) {
-                    // Max retries reached, require manual restart
-                    Log.w("VoiceViewModel", "Max retries reached, stopping auto-restart")
-                    accessibilityManager?.speak("Too many attempts. Tap the microphone to try again.")
-                    _lastError.value = "Tap microphone to try again"
-                } else {
-                    // Non-recoverable error or auto-restart disabled
-                    accessibilityManager?.speak(errorMessage)
-                }
-            }
-
-            override fun onResults(results: Bundle?) {
-                Log.d("VoiceViewModel", "Speech results received")
-                _listeningState.value = ListeningState.Idle
-                
-                val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                if (!matches.isNullOrEmpty()) {
-                    val rawText = matches[0]
-                    _recognizedText.value = rawText
-                    retryCount = 0 // Reset retry count on successful recognition
-                    processCommand(rawText)
-                } else {
-                    _commandResult.value = CommandResult.NoMatch
-                }
-            }
-
-            override fun onPartialResults(partialResults: Bundle?) {
-                // Partial results - can be used for real-time feedback
-                val partial = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                if (!partial.isNullOrEmpty()) {
-                    _recognizedText.value = partial[0]
-                }
-            }
-
-            override fun onEvent(eventType: Int, params: Bundle?) {
-                // Reserved for future events
-            }
-        })
+        // No setup needed for custom recorder
     }
 
     // ============================================================
@@ -401,32 +286,35 @@ class VoiceViewModel(
             return
         }
 
-        if (speechRecognizer == null) {
-            _lastError.value = "Speech recognition not available on this device"
-            _listeningState.value = ListeningState.Error("Speech recognition not available")
-            return
-        }
+        _listeningState.value = ListeningState.Listening
+        accessibilityManager?.speak("Listening...")
 
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
-            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-            putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true) // Prefer offline for faster response
-            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
-            
-            // ============ FIX FOR ERROR 13: Speech Timeout ============
-            // Longer speech input time to prevent timeout errors
-            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 5000L) // 5 seconds of silence before ending
-            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 3000L) // 3 seconds for possibly complete
-            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 3000L) // Minimum 3 seconds of speech
-        }
-
-        try {
-            speechRecognizer.startListening(intent)
-        } catch (e: Exception) {
-            Log.e("VoiceViewModel", "Error starting listening: ${e.message}")
-            _lastError.value = "Failed to start voice recognition: ${e.message}"
-            _listeningState.value = ListeningState.Error(e.message ?: "Unknown error")
+        viewModelScope.launch {
+            try {
+                val audioData = audioRecorder.recordAudio()
+                if (audioData != null && audioData.isNotEmpty()) {
+                    _listeningState.value = ListeningState.Processing
+                    accessibilityManager?.speak("Processing...")
+                    
+                    val result = speechService.transcribeAndTranslate(audioData, languageCode)
+                    
+                    if (result == "Speech services are not configured yet." || result.isBlank()) {
+                         _listeningState.value = ListeningState.Error(result)
+                         _lastError.value = result
+                         accessibilityManager?.speak(result)
+                    } else {
+                        _recognizedText.value = result
+                        _listeningState.value = ListeningState.Idle
+                        processCommand(result)
+                    }
+                } else {
+                    _listeningState.value = ListeningState.Idle
+                    _lastError.value = "No audio recorded"
+                }
+            } catch (e: Exception) {
+                Log.e("VoiceViewModel", "Error in voice flow: ${e.message}")
+                _listeningState.value = ListeningState.Error(e.message ?: "Unknown error")
+            }
         }
     }
 
@@ -457,7 +345,7 @@ class VoiceViewModel(
      */
     fun stopListening() {
         if (_listeningState.value == ListeningState.Listening) {
-            speechRecognizer?.stopListening()
+            audioRecorder.stopRecording()
             _listeningState.value = ListeningState.Idle
         }
     }
@@ -476,8 +364,11 @@ class VoiceViewModel(
     /**
      * Check if speech recognizer is available on this device
      */
+    /**
+     * Check if speech recognizer is available on this device
+     */
     fun isSpeechRecognizerAvailable(): Boolean {
-        return speechRecognizer != null
+        return true
     }
 
     /**
@@ -493,8 +384,7 @@ class VoiceViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        speechRecognizer?.destroy()
-        Log.d("VoiceViewModel", "ViewModel cleared - SpeechRecognizer destroyed")
+        audioRecorder.stopRecording()
     }
 }
 
