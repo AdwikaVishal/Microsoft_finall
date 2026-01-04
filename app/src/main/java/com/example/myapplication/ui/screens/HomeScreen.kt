@@ -10,7 +10,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 
 @Composable
 fun HomeScreen(
@@ -26,21 +28,21 @@ fun HomeScreen(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Button(onClick = onSimulateAlert) {
-                Text("SIMULATE DISASTER ALERT")
+                Text(stringResource(R.string.simulate_disaster_alert))
             }
             
             Spacer(modifier = Modifier.height(24.dp))
             
             // New Camera Button for Real-time Exit Detection
             Button(onClick = onOpenCamera) {
-                Text("SCAN SURROUNDINGS (EXIT)")
+                Text(stringResource(R.string.scan_surroundings))
             }
 
             // Voice Command Button (Visible or specialized for blind users)
             if (isBlind) {
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(onClick = onVoiceCommand) {
-                    Text("START VOICE COMMAND")
+                    Text(stringResource(R.string.start_voice_command))
                 }
             }
             
@@ -48,7 +50,7 @@ fun HomeScreen(
             
             // Reset Button
             Button(onClick = onResetApp) {
-                Text("RESET APP (CLEAR USER DATA)")
+                Text(stringResource(R.string.reset_app))
             }
         }
     }

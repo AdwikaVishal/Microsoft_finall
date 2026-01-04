@@ -14,5 +14,6 @@ enum class AbilityType {
     HARD_OF_HEARING,
     NON_VERBAL,
     ELDERLY,
-    NORMAL
+    OTHER,
+    NONE
 }

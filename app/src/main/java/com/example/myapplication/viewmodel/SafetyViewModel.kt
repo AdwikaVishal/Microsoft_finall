@@ -36,8 +36,8 @@ private fun AbilityProfile.toAbilityType(): AbilityType =
         AbilityProfile.DEAF -> AbilityType.DEAF
         AbilityProfile.NON_VERBAL -> AbilityType.NON_VERBAL
         AbilityProfile.ELDERLY -> AbilityType.ELDERLY
-        AbilityProfile.OTHER -> AbilityType.NORMAL
-        AbilityProfile.NONE -> AbilityType.NORMAL
+        AbilityProfile.OTHER -> AbilityType.OTHER
+        AbilityProfile.NONE -> AbilityType.NONE
     }
 
 class SafetyViewModel(application: Application) : AndroidViewModel(application) {

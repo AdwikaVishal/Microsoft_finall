@@ -1,7 +1,6 @@
 package com.example.myapplication
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
@@ -19,7 +18,7 @@ import com.example.myapplication.viewmodel.SOSViewModel
 import com.example.myapplication.viewmodel.ScanViewModel
 import com.example.myapplication.viewmodel.ScanViewModelFactory
 
-class MainActivity : ComponentActivity() {
+class MainActivity : BaseActivity() {
 
     private val sosViewModel: SOSViewModel by viewModels { ViewModelFactory(application) }
     private val alertViewModel: AlertViewModel by viewModels { ViewModelFactory(application) }
@@ -36,7 +35,7 @@ class MainActivity : ComponentActivity() {
         accessibilityManager = AccessibilityManager(this)
         
         // Speak welcome message
-        accessibilityManager.speak("Welcome to SenseSafe. Your safety app is ready.")
+        accessibilityManager.speak(getString(R.string.welcome_message))
 
         // Restore auth token to RetrofitClient
         val userPreferencesRepository = UserPreferencesRepository(applicationContext)

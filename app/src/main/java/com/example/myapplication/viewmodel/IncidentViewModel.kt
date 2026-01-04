@@ -14,6 +14,9 @@ class IncidentViewModel(private val apiService: ApiService) : ViewModel() {
     private val _incidents = MutableStateFlow<List<Incident>>(emptyList())
     val incidents: StateFlow<List<Incident>> = _incidents
 
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
+
     // Report incident state
     private val _reportState = MutableStateFlow<ReportIncidentState>(ReportIncidentState.Idle)
     val reportState: StateFlow<ReportIncidentState> = _reportState
@@ -37,9 +40,15 @@ class IncidentViewModel(private val apiService: ApiService) : ViewModel() {
     fun fetchIncidents() {
         viewModelScope.launch {
             try {
-                _incidents.value = apiService.getMyIncidents()
+                val response = apiService.getMyIncidents()
+                _incidents.value = response.incidents
+                _errorMessage.value = null
+                android.util.Log.d("IncidentViewModel", "Fetched ${response.incidents.size} incidents")
             } catch (e: Exception) {
                 // Handle error
+                _incidents.value = emptyList()
+                _errorMessage.value = e.message ?: "Failed to fetch incidents"
+                android.util.Log.e("IncidentViewModel", "Error fetching incidents", e)
             }
         }
     }

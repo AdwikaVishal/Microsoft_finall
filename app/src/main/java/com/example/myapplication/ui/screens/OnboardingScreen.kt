@@ -9,9 +9,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 import com.example.myapplication.data.AbilityProfile
 
 /**
@@ -25,6 +27,8 @@ fun OnboardingScreen(
     onProfileSelected: (AbilityProfile) -> Unit,
     onContinue: () -> Unit
 ) {
+    val continueContentDescription = stringResource(R.string.continue_to_main_app)
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -33,7 +37,7 @@ fun OnboardingScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Select Your Profile",
+            text = stringResource(R.string.select_your_profile),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 24.dp)
         )
@@ -71,9 +75,9 @@ fun OnboardingScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
-                .semantics { contentDescription = "Continue to main app" }
+                .semantics { contentDescription = continueContentDescription }
         ) {
-            Text("Continue")
+            Text(stringResource(R.string.continue_button))
         }
     }
 }

@@ -103,7 +103,7 @@ class SOSViewModel(application: Application, private val apiService: ApiService,
                 viewModelScope.launch {
                     try {
                         val userId = userPreferencesRepository.authToken.first() ?: ""
-                        val abilityType = userPreferencesRepository.abilityType.first() ?: AbilityType.NORMAL
+                        val abilityType = userPreferencesRepository.abilityType.first() ?: AbilityType.NONE
                         // TODO: Get actual battery percentage
                         val batteryPercentage = 80
 

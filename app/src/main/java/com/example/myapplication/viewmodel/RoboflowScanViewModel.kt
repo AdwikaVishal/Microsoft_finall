@@ -12,6 +12,7 @@ import com.example.myapplication.model.DetectedObject
 import com.example.myapplication.model.DetectionResult
 import com.example.myapplication.model.ScanResult
 import com.example.myapplication.model.ScanUiState
+import com.example.myapplication.network.RoboflowService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,17 +20,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /**
- * RoboflowScanViewModel - Manages scanning using 4 parallel Roboflow APIs
+ * RoboflowScanViewModel - Manages scanning using 4 sequential Roboflow APIs
  * 
  * This ViewModel handles:
  * - Capturing images from CameraX
- * - Sending images to ALL 4 Roboflow models in parallel (windows, doors, hallways, stairs)
+ * - Resizing images to prevent network errors
+ * - Sending images to ALL 4 Roboflow models sequentially (windows, doors, hallways, stairs)
  * - Merging results from all models
  * - Managing UI state (Idle, Loading, Success, Error)
  * - Drawing bounding boxes on detected objects
  * - Speaking "Exit found" when any exit is detected
- * - Cancelling in-progress scans when leaving the screen
  * - Graceful error handling without app crashes
+ * - No auto-cancel during API requests (prevents SocketException)
  * 
  * Architecture: MVVM pattern consistent with existing project
  * 
@@ -101,6 +103,21 @@ class RoboflowScanViewModel(application: Application) : AndroidViewModel(applica
     
     init {
         checkConfiguration()
+        
+        // Debug: Log BuildConfig values for verification
+        Log.d(TAG, "========================================")
+        Log.d(TAG, "🔧 ROBOFLOW CONFIGURATION CHECK")
+        Log.d(TAG, "========================================")
+        Log.d(TAG, "WINDOWS_URL: ${RoboflowService.WINDOWS_URL}")
+        Log.d(TAG, "WINDOWS_KEY: ${RoboflowService.WINDOWS_API_KEY.take(10)}...")
+        Log.d(TAG, "DOORS_URL: ${RoboflowService.DOORS_URL}")
+        Log.d(TAG, "DOORS_KEY: ${RoboflowService.DOORS_API_KEY.take(10)}...")
+        Log.d(TAG, "HALL_URL: ${RoboflowService.HALL_URL}")
+        Log.d(TAG, "HALL_KEY: ${RoboflowService.HALL_API_KEY.take(10)}...")
+        Log.d(TAG, "STAIRS_URL: ${RoboflowService.STAIRS_URL}")
+        Log.d(TAG, "STAIRS_KEY: ${RoboflowService.STAIRS_API_KEY.take(10)}...")
+        Log.d(TAG, "Configuration status: ${if (isConfigured.value) "✅ READY" else "❌ NOT CONFIGURED"}")
+        Log.d(TAG, "========================================")
     }
     
     /**
@@ -118,13 +135,13 @@ class RoboflowScanViewModel(application: Application) : AndroidViewModel(applica
     // ============================================================
     
     /**
-     * Perform object detection on the given image using ALL 4 models in parallel.
+     * Perform object detection on the given image using ALL 4 models sequentially.
      * 
      * This method:
      * 1. Cancels any existing scan job
      * 2. Sets UI to Loading state ("Scanning...")
-     * 3. Launches a new coroutine for parallel API calls
-     * 4. Calls 4 models: windows, doors, hallways, stairs
+     * 3. Launches a new coroutine for sequential API calls
+     * 4. Calls 4 models: windows, doors, hallways, stairs (one after another)
      * 5. Merges all predictions
      * 6. Handles success, empty results, and error cases
      * 
@@ -142,7 +159,7 @@ class RoboflowScanViewModel(application: Application) : AndroidViewModel(applica
         // Start new scan job
         scanJob = viewModelScope.launch {
             try {
-                // Call all 4 models in parallel
+                // Call all 4 models sequentially (not parallel to avoid network overload)
                 val result = roboflowRepository.detectAllModels(bitmap)
                 _detectionResult.value = result
                 handleDetectionResult(result)

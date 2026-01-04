@@ -20,7 +20,7 @@ interface ApiService {
     suspend fun reportIncident(@Body request: IncidentRequest): Incident
 
     @GET("/api/incidents/user")
-    suspend fun getMyIncidents(): List<Incident>
+    suspend fun getMyIncidents(): IncidentListResponse
 
 
     // --------------- SOS (PUBLIC) ---------------
@@ -43,4 +43,12 @@ data class RegisterRequest(
 
 data class AuthResponse(
     val token: String
+)
+
+// -------- INCIDENT LIST RESPONSE --------
+data class IncidentListResponse(
+    val incidents: List<Incident>,
+    val total: Int,
+    val page: Int,
+    val page_size: Int
 )

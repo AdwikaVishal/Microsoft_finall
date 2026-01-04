@@ -17,6 +17,7 @@ class UserPreferencesRepository(private val context: Context) {
     private val authTokenKey = stringPreferencesKey("auth_token")
     private val abilityTypeKey = stringPreferencesKey("ability_type")
     private val languageKey = stringPreferencesKey("language")
+    private val userNameKey = stringPreferencesKey("user_name")
 
     val authToken: Flow<String?> = context.dataStore.data
         .map { preferences ->
@@ -25,12 +26,17 @@ class UserPreferencesRepository(private val context: Context) {
 
     val abilityType: Flow<AbilityType> = context.dataStore.data
         .map { preferences ->
-            AbilityType.valueOf(preferences[abilityTypeKey] ?: AbilityType.NORMAL.name)
+            AbilityType.valueOf(preferences[abilityTypeKey] ?: AbilityType.NONE.name)
         }
 
     val language: Flow<String> = context.dataStore.data
         .map { preferences ->
             preferences[languageKey] ?: "en"
+        }
+
+    val userName: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[userNameKey]
         }
 
     suspend fun saveAuthToken(token: String) {
@@ -48,6 +54,12 @@ class UserPreferencesRepository(private val context: Context) {
     suspend fun saveLanguage(language: String) {
         context.dataStore.edit {
             it[languageKey] = language
+        }
+    }
+
+    suspend fun saveUserName(name: String) {
+        context.dataStore.edit {
+            it[userNameKey] = name
         }
     }
 }

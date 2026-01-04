@@ -98,7 +98,7 @@ class VoiceViewModel(
     // SPEECH SERVICES
     // ============================================================
 
-    private val speechService = SpeechService()
+    private val speechService = SpeechService(context)
     private val audioRecorder = AudioRecorder()
 
     // Navigation callbacks (set by the UI)
@@ -291,29 +291,40 @@ class VoiceViewModel(
 
         viewModelScope.launch {
             try {
-                val audioData = audioRecorder.recordAudio()
-                if (audioData != null && audioData.isNotEmpty()) {
-                    _listeningState.value = ListeningState.Processing
-                    accessibilityManager?.speak("Processing...")
-                    
-                    val result = speechService.transcribeAndTranslate(audioData, languageCode)
-                    
-                    if (result == "Speech services are not configured yet." || result.isBlank()) {
-                         _listeningState.value = ListeningState.Error(result)
-                         _lastError.value = result
-                         accessibilityManager?.speak(result)
-                    } else {
+                // Android Native SpeechRecognizer handles its own audio capture
+                // We pass empty ByteArray since it's not used
+                _listeningState.value = ListeningState.Processing
+                
+                val result = speechService.transcribeAndTranslate(ByteArray(0), languageCode)
+                
+                // Handle different result scenarios
+                when {
+                    // Empty result = no speech detected (common with Android Native)
+                    result.isEmpty() -> {
+                        _listeningState.value = ListeningState.Idle
+                        _lastError.value = "No speech detected. Please try again."
+                        _recognizedText.value = ""
+                        accessibilityManager?.speak("No speech detected. Please try again.")
+                        Log.d("VoiceViewModel", "No speech detected - user should retry")
+                    }
+                    // Service not configured error
+                    result == "Speech services are not configured yet." -> {
+                        _listeningState.value = ListeningState.Error(result)
+                        _lastError.value = result
+                        accessibilityManager?.speak(result)
+                    }
+                    // Success - process the command
+                    else -> {
                         _recognizedText.value = result
                         _listeningState.value = ListeningState.Idle
+                        _lastError.value = null
                         processCommand(result)
                     }
-                } else {
-                    _listeningState.value = ListeningState.Idle
-                    _lastError.value = "No audio recorded"
                 }
             } catch (e: Exception) {
                 Log.e("VoiceViewModel", "Error in voice flow: ${e.message}")
                 _listeningState.value = ListeningState.Error(e.message ?: "Unknown error")
+                _lastError.value = e.message
             }
         }
     }

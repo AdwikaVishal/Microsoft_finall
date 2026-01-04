@@ -20,7 +20,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
+import com.example.myapplication.R
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.accessibility.AccessibilityManager
@@ -92,7 +93,7 @@ fun VoiceCommandScreen(
                 accessibilityManager?.speak(result.message)
             }
             is VoiceViewModel.CommandResult.NoMatch -> {
-                accessibilityManager?.speak("Command not recognized. Try again.")
+                accessibilityManager?.speak(context.getString(R.string.command_not_recognized))
             }
             null -> { /* Initial state */ }
         }
@@ -122,13 +123,13 @@ fun VoiceCommandScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Voice Command") },
+                title = { Text(stringResource(R.string.voice_command)) },
                 navigationIcon = {
                     IconButton(onClick = {
                         viewModel.stopListening()
                         onNavigateBack()
                     }) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -202,9 +203,9 @@ fun VoiceCommandScreen(
                         else -> Icons.Default.Mic
                     },
                     contentDescription = when {
-                        !micPermissionState.status.isGranted -> "Grant microphone permission"
-                        isListening -> "Stop listening"
-                        else -> "Start listening"
+                        !micPermissionState.status.isGranted -> stringResource(R.string.grant_microphone_permission)
+                        isListening -> stringResource(R.string.stop_listening)
+                        else -> stringResource(R.string.start_listening)
                     },
                     tint = Color.White,
                     modifier = Modifier.size(40.dp)
@@ -216,10 +217,10 @@ fun VoiceCommandScreen(
             // Status text
             Text(
                 text = when {
-                    !micPermissionState.status.isGranted -> "Tap to grant microphone permission"
-                    isListening -> "Listening... Say a command"
-                    listeningState is VoiceViewModel.ListeningState.Processing -> "Processing..."
-                    else -> "Tap to speak"
+                    !micPermissionState.status.isGranted -> stringResource(R.string.tap_to_grant_permission)
+                    isListening -> stringResource(R.string.listening_say_command)
+                    listeningState is VoiceViewModel.ListeningState.Processing -> stringResource(R.string.processing)
+                    else -> stringResource(R.string.tap_to_speak)
                 },
                 style = MaterialTheme.typography.bodyLarge,
                 color = when (listeningState) {
@@ -256,7 +257,7 @@ fun VoiceCommandScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Heard:",
+                                text = stringResource(R.string.heard),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -298,7 +299,7 @@ fun VoiceCommandScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Microphone Permission Required",
+                                text = stringResource(R.string.microphone_permission_required),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onErrorContainer
@@ -307,9 +308,9 @@ fun VoiceCommandScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = if (micPermissionState.status.shouldShowRationale) {
-                                "Microphone permission is needed to listen to your voice commands. Please grant the permission to use voice commands."
+                                stringResource(R.string.permission_rationale)
                             } else {
-                                "Please grant microphone permission to enable voice commands."
+                                stringResource(R.string.permission_request)
                             },
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onErrorContainer
@@ -332,17 +333,17 @@ fun VoiceCommandScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "Supported Commands",
+                        text = stringResource(R.string.supported_commands),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     
-                    CommandItem("open scan", "Navigate to scan screen")
-                    CommandItem("send sos", "Trigger emergency SOS")
-                    CommandItem("show alerts", "View active alerts")
-                    CommandItem("back home", "Return to home screen")
-                    CommandItem("send incident [description]", "Report an incident with voice")
+                    CommandItem(stringResource(R.string.cmd_open_scan), stringResource(R.string.cmd_open_scan_desc))
+                    CommandItem(stringResource(R.string.cmd_send_sos), stringResource(R.string.cmd_send_sos_desc))
+                    CommandItem(stringResource(R.string.cmd_show_alerts), stringResource(R.string.cmd_show_alerts_desc))
+                    CommandItem(stringResource(R.string.cmd_back_home), stringResource(R.string.cmd_back_home_desc))
+                    CommandItem(stringResource(R.string.cmd_send_incident), stringResource(R.string.cmd_send_incident_desc))
                 }
             }
 
@@ -371,7 +372,7 @@ fun VoiceCommandScreen(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = "Speech recognition is not available on this device",
+                            text = stringResource(R.string.speech_not_available),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onErrorContainer
                         )
@@ -390,26 +391,27 @@ private fun StatusIndicator(
     state: VoiceViewModel.ListeningState,
     error: String?
 ) {
+    val context = LocalContext.current
     val (icon, color, text) = when (state) {
         is VoiceViewModel.ListeningState.Idle -> Triple(
             Icons.Default.Mic,
             MaterialTheme.colorScheme.primary,
-            "Ready for voice command"
+            context.getString(R.string.ready_for_voice_command)
         )
         is VoiceViewModel.ListeningState.Listening -> Triple(
             Icons.Default.RecordVoiceOver,
             Color.Red,
-            "Listening..."
+            context.getString(R.string.listening)
         )
         is VoiceViewModel.ListeningState.Processing -> Triple(
             Icons.Default.HourglassEmpty,
             MaterialTheme.colorScheme.secondary,
-            "Processing speech..."
+            context.getString(R.string.processing_speech)
         )
         is VoiceViewModel.ListeningState.Error -> Triple(
             Icons.Default.Error,
             MaterialTheme.colorScheme.error,
-            error ?: "An error occurred"
+            error ?: context.getString(R.string.error_occurred)
         )
     }
 

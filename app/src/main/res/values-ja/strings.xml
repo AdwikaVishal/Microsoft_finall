@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SenseSafe</string>
+    
+    <!-- Mapbox Access Token -->
+    <string name="mapbox_access_token" translatable="false">pk.eyJ1Ijoic2hhbnRhbnUzMCIsImEiOiJjbWp5Z2ozMWEzdHgyM2VzZXl3dGN1b2FjIn0.J1WKzn7Bu4EezdfBphdgEg</string>
+
+    <!-- Home Screen -->
+    <string name="simulate_disaster_alert">災害警報をシミュレート</string>
+    <string name="scan_surroundings">周囲をスキャン（出口）</string>
+    <string name="start_voice_command">音声コマンドを開始</string>
+    <string name="reset_app">アプリをリセット（ユーザーデータを削除）</string>
+
+    <!-- Onboarding Screen -->
+    <string name="select_your_profile">プロフィールを選択</string>
+    <string name="continue_button">続行</string>
+    <string name="continue_to_main_app">メインアプリに進む</string>
+
+    <!-- Voice Command Screen -->
+    <string name="voice_command">音声コマンド</string>
+    <string name="close">閉じる</string>
+    <string name="grant_microphone_permission">マイクの許可を与える</string>
+    <string name="stop_listening">聞き取りを停止</string>
+    <string name="start_listening">聞き取りを開始</string>
+    <string name="tap_to_grant_permission">タップしてマイクの許可を与える</string>
+    <string name="listening_say_command">聞いています...コマンドを言ってください</string>
+    <string name="processing">処理中...</string>
+    <string name="tap_to_speak">タップして話す</string>
+    <string name="heard">聞き取り:</string>
+    <string name="microphone_permission_required">マイクの許可が必要</string>
+    <string name="permission_rationale">音声コマンドを聞くためにマイクの許可が必要です。音声コマンドを使用するために許可を与えてください。</string>
+    <string name="permission_request">音声コマンドを有効にするためにマイクの許可を与えてください。</string>
+    <string name="supported_commands">サポートされているコマンド</string>
+    <string name="speech_not_available">このデバイスでは音声認識が利用できません</string>
+    <string name="ready_for_voice_command">音声コマンドの準備完了</string>
+    <string name="listening">聞いています...</string>
+    <string name="processing_speech">音声を処理中...</string>
+    <string name="error_occurred">エラーが発生しました</string>
+    <string name="command_not_recognized">コマンドが認識されませんでした。もう一度お試しください。</string>
+
+    <!-- Voice Commands -->
+    <string name="cmd_open_scan">"スキャンを開く"</string>
+    <string name="cmd_open_scan_desc">スキャン画面に移動</string>
+    <string name="cmd_send_sos">"SOSを送信"</string>
+    <string name="cmd_send_sos_desc">緊急SOSを発動</string>
+    <string name="cmd_show_alerts">"アラートを表示"</string>
+    <string name="cmd_show_alerts_desc">アクティブなアラートを表示</string>
+    <string name="cmd_back_home">"ホームに戻る"</string>
+    <string name="cmd_back_home_desc">ホーム画面に戻る</string>
+    <string name="cmd_send_incident">"インシデントを送信 [説明]"</string>
+    <string name="cmd_send_incident_desc">音声でインシデントを報告</string>
+    
+    <!-- SOS Screen -->
+    <string name="sos_screen">SOS画面</string>
+    
+    <!-- Status Screen -->
+    <string name="status_screen">ステータス画面</string>
+    
+    <!-- General -->
+    <string name="welcome_message">SenseSafeへようこそ。安全アプリの準備が完了しました。</string>
+    <string name="welcome_user">ようこそ、%1$s</string>
+    <string name="emergency_alert">緊急警報</string>
+    <string name="incident_reported">インシデントが報告されました</string>
+    <string name="location_tracking">位置追跡</string>
+    <string name="settings">設定</string>
+    <string name="language">言語</string>
+    <string name="english">English</string>
+    <string name="spanish">Español</string>
+    <string name="french">Français</string>
+    <string name="german">Deutsch</string>
+    <string name="chinese_simplified">中文 (简体)</string>
+    <string name="japanese">日本語</string>
+
+    <!-- Main Screen & Dialogs -->
+    <string name="test_alert_dev">テストアラート（開発）</string>
+    <string name="cancel">キャンセル</string>
+    <string name="sending_sos">SOSを送信中</string>
+    <string name="stay_calm_help_coming">落ち着いてください。助けが向かっています。</string>
+    <string name="sos_sent_successfully">SOSが正常に送信されました</string>
+    <string name="sos_sent_to_responders">あなたのSOSが緊急対応者に送信されました。</string>
+    <string name="sos_failed">SOS送信に失敗しました</string>
+    <string name="ok">OK</string>
+    <string name="scan_completed">スキャンが正常に完了しました</string>
+    <string name="scan_again">再スキャン</string>
+
+    <!-- Main Screen -->
+    <string name="quick_actions">クイックアクション</string>
+    <string name="scan_area">スキャンエリア</string>
+    <string name="detect_exits_hazards">出口と危険を検出</string>
+    <string name="speak_for_help">助けを求めて話す</string>
+    <string name="your_status">あなたのステータス</string>
+    <string name="active_alerts">アクティブなアラート</string>
+    <string name="alert_active">アラートがアクティブ</string>
+    <string name="no_active_alerts">アクティブなアラートはありません</string>
+    <string name="sos_status">SOSステータス</string>
+    <string name="ready">準備完了</string>
+    <string name="sending">送信中...</string>
+    <string name="sent">送信済み</string>
+    <string name="failed">失敗</string>
+    <string name="features">機能</string>
+    <string name="incident_timeline">インシデントタイムライン</string>
+    <string name="view_reported_incidents">報告されたインシデントを表示</string>
+    <string name="report_incident">インシデントを報告</string>
+    <string name="report_new_incident">新しいインシデントを報告</string>
+    <string name="track_location">位置を追跡</string>
+    <string name="share_location_responders">対応者と位置を共有</string>
+    <string name="send_sos">SOSを送信</string>
+    <string name="select_current_status">現在のステータスを選択:</string>
+    <string name="exit_detection_complete">出口検出完了</string>
+
+    <!-- Camera Screen -->
+    <string name="grant_permission">許可を与える</string>
+    <string name="go_back">戻る</string>
+    <string name="dismiss">閉じる</string>
+    <string name="retry">再試行</string>
+    <string name="done">完了</string>
+    <string name="failed_to_process_image">画像の処理に失敗しました</string>
+    <string name="error_processing_image">画像処理エラー: %1$s</string>
+    <string name="failed_to_capture_image">画像の撮影に失敗しました</string>
+
+    <!-- Report Incident Screen -->
+    <string name="select_category">カテゴリを選択</string>
+    <string name="choose_incident_type">インシデントタイプを選択</string>
+    <string name="describe_incident">インシデントを説明</string>
+    <string name="provide_details">何が起こったかの詳細を提供してください...</string>
+    <string name="enable_location">位置情報を有効にする</string>
+
+    <!-- Track Location Screen -->
+    <string name="open_settings">設定を開く</string>
+    <string name="gps_settings">GPS設定</string>
+
+    <!-- Timeline Screen -->
+    <string name="loading_incidents">インシデントを読み込み中...</string>
+
+    <!-- Guidance Screen -->
+    <string name="guidance_screen">ガイダンス画面</string>
+    
+    <!-- Ability Profiles -->
+    <string name="ability_blind">拡張された音声と触覚フィードバック</string>
+    <string name="ability_low_vision">大きなテキストと高コントラスト</string>
+    <string name="ability_deaf">視覚と振動アラート</string>
+    <string name="ability_hard_of_hearing">増幅された音声と視覚的手がかり</string>
+    <string name="ability_non_verbal">簡素化されたボタンとジェスチャー</string>
+    <string name="ability_elderly">大きなテキストとより明確なインターフェース</string>
+    <string name="ability_other">カスタムアクセシビリティ設定</string>
+    <string name="ability_none">標準アクセシビリティ設定</string>
+    
+    <!-- Ability Names -->
+    <string name="ability_name_blind">盲目</string>
+    <string name="ability_name_low_vision">弱視</string>
+    <string name="ability_name_deaf">聴覚障害</string>
+    <string name="ability_name_hard_of_hearing">難聴</string>
+    <string name="ability_name_non_verbal">非言語</string>
+    <string name="ability_name_elderly">高齢者</string>
+    <string name="ability_name_other">その他</string>
+    <string name="ability_name_none">なし</string>
+</resources>

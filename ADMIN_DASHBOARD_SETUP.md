@@ -82,7 +82,7 @@ python test_backend.py
 
 ### No Data Showing
 - Check if backend server is running on port 8000
-- Verify incidents exist: `GET http://10.28.84.165:8000/api/incidents/user`
+- Verify incidents exist: `GET http://192.168.0.130:8000/api/incidents/user`
 - Check browser console for API errors
 
 ## 📱 Android App Integration

@@ -71,7 +71,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -98,13 +98,14 @@ import java.util.concurrent.Executors
  * Features:
  * - CameraX live preview
  * - Scan button to capture and analyze image with 4 Roboflow models
- * - Parallel detection: windows, doors, hallways, stairs
+ * - Sequential detection: windows, doors, hallways, stairs (one after another)
+ * - Image resizing to prevent network errors
  * - Real-time exit detection with bounding box overlay
  * - "Scanning..." text during API calls
- * - "No exits detected yet" when no predictions from any model
+ * - "No exits detected" when no predictions from any model (with manual retry)
  * - "Exit found" speech feedback when anything matches
  * - Friendly error handling with Toast (no crashes)
- * - Cancel in-progress scans when leaving screen
+ * - No auto-cancel during API requests (prevents SocketException)
  * 
  * API Key Setup:
  * 1. Get API keys from Roboflow dashboard for each model
@@ -173,13 +174,6 @@ fun CameraScreen(
         }
     }
     
-    // Cancel scan when leaving screen
-    DisposableEffect(Unit) {
-        onDispose {
-            viewModel.cancelScan()
-        }
-    }
-    
     // Show Toast for errors
     LaunchedEffect(uiState) {
         if (uiState is ScanUiState.Error) {
@@ -224,33 +218,42 @@ fun CameraScreen(
     
     /**
      * Capture image and send to Roboflow for scanning.
-     * Uses FrameConverter helper to convert CameraX frame to Base64.
+     * Simplified approach: directly convert ImageProxy to Bitmap.
      */
     fun captureAndScan() {
         imageCapture?.takePicture(
             cameraExecutor,
             object : ImageCapture.OnImageCapturedCallback() {
-                override fun onCaptureSuccess(image: ImageProxy) {
-                    // Convert CameraX frame → Base64 using FrameConverter
-                    val base64Image = FrameConverter.imageProxyToBase64(image)
-                    image.close()
-                    
-                    if (base64Image != null) {
-                        // Convert back to bitmap for scanning
-                        val bitmap = image.toBitmap()
+                @androidx.annotation.OptIn(androidx.camera.core.ExperimentalGetImage::class)
+                override fun onCaptureSuccess(imageProxy: ImageProxy) {
+                    try {
+                        // Convert ImageProxy to Bitmap directly
+                        val bitmap = imageProxy.toBitmap()
+                        imageProxy.close()
+                        
                         if (bitmap != null) {
+                            // Send bitmap to ViewModel for Roboflow scanning
                             viewModel.scanImage(bitmap)
                         } else {
-                            Toast.makeText(context, "Failed to process image", Toast.LENGTH_SHORT).show()
+                            // ✅ FIX: Run Toast on Main Thread
+                            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                Toast.makeText(context, "Failed to process image", Toast.LENGTH_SHORT).show()
+                            }
                         }
-                    } else {
-                        Toast.makeText(context, "Failed to convert image", Toast.LENGTH_SHORT).show()
+                    } catch (e: Exception) {
+                        imageProxy.close()
+                        android.os.Handler(android.os.Looper.getMainLooper()).post {
+                            Toast.makeText(context, "Error processing image: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
                 
                 override fun onError(exception: ImageCaptureException) {
                     Log.e("CameraScreen", "Image capture failed: ${exception.message}")
-                    Toast.makeText(context, "Failed to capture image", Toast.LENGTH_SHORT).show()
+                    // ✅ FIX: Run Toast on Main Thread
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        Toast.makeText(context, "Failed to capture image", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         )
@@ -259,11 +262,59 @@ fun CameraScreen(
     // Extension to convert ImageProxy to Bitmap
     @androidx.annotation.OptIn(androidx.camera.core.ExperimentalGetImage::class)
     fun ImageProxy.toBitmap(): android.graphics.Bitmap? {
-        val buffer = planes[0].buffer
-        buffer.rewind()
-        val bytes = ByteArray(buffer.capacity())
-        buffer.get(bytes)
-        return android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        return try {
+            val image = this.image ?: return null
+            
+            // Get the YUV planes
+            val planes = image.planes
+            val yBuffer = planes[0].buffer
+            val uBuffer = planes[1].buffer
+            val vBuffer = planes[2].buffer
+            
+            val ySize = yBuffer.remaining()
+            val uSize = uBuffer.remaining()
+            val vSize = vBuffer.remaining()
+            
+            // Create NV21 byte array
+            val nv21 = ByteArray(ySize + uSize + vSize)
+            yBuffer.get(nv21, 0, ySize)
+            vBuffer.get(nv21, ySize, vSize)
+            uBuffer.get(nv21, ySize + vSize, uSize)
+            
+            // Convert NV21 to Bitmap using YuvImage
+            val yuvImage = android.graphics.YuvImage(
+                nv21,
+                android.graphics.ImageFormat.NV21,
+                image.width,
+                image.height,
+                null
+            )
+            
+            val out = java.io.ByteArrayOutputStream()
+            yuvImage.compressToJpeg(
+                android.graphics.Rect(0, 0, image.width, image.height),
+                90,
+                out
+            )
+            
+            val imageBytes = out.toByteArray()
+            val bitmap = android.graphics.BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+            
+            // Apply rotation if needed
+            val rotationDegrees = this.imageInfo.rotationDegrees
+            if (rotationDegrees != 0 && bitmap != null) {
+                val matrix = android.graphics.Matrix()
+                matrix.postRotate(rotationDegrees.toFloat())
+                android.graphics.Bitmap.createBitmap(
+                    bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
+                )
+            } else {
+                bitmap
+            }
+        } catch (e: Exception) {
+            Log.e("CameraScreen", "Failed to convert ImageProxy to Bitmap", e)
+            null
+        }
     }
     
     Scaffold(
@@ -350,13 +401,16 @@ fun CameraScreen(
                                             analyzer.setAnalyzer(cameraExecutor) { imageProxy ->
                                                 // Simple real-time detection simulation
                                                 processImageProxy(imageProxy) { result ->
-                                                    detectedText = result
-                                                    if (result.contains("EXIT", true)) {
-                                                        showArrow = true
-                                                        showWarning = false
-                                                    } else {
-                                                        showArrow = false
-                                                        showWarning = (System.currentTimeMillis() % 10000) < 2000
+                                                    // ✅ FIX: Update Compose state on Main Thread
+                                                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                                        detectedText = result
+                                                        if (result.contains("EXIT", true)) {
+                                                            showArrow = true
+                                                            showWarning = false
+                                                        } else {
+                                                            showArrow = false
+                                                            showWarning = (System.currentTimeMillis() % 10000) < 2000
+                                                        }
                                                     }
                                                 }
                                             }
@@ -406,13 +460,15 @@ fun CameraScreen(
                         // =====================================================
                         // NO EXITS DETECTED TEXT
                         // Show when no predictions from any of the 4 models
+                        // User can manually retry
                         // =====================================================
                         if (uiState is ScanUiState.Success) {
                             val result = (uiState as ScanUiState.Success).result
                             if (result.objects.isEmpty()) {
                                 NoDetectionsOverlay(
-                                    message = result.description.ifEmpty { "No exits detected yet" },
-                                    onRetry = { captureAndScan() }
+                                    message = result.description.ifEmpty { "No exits detected. Try different angle or lighting." },
+                                    onRetry = { captureAndScan() },
+                                    onDismiss = { viewModel.resetState() }
                                 )
                             }
                         }
@@ -631,13 +687,15 @@ fun ScanningOverlay() {
 /**
  * No Detections Overlay - Shows when no exits are detected.
  * 
- * @property message The message to display (e.g., "No exits detected yet")
+ * @property message The message to display (e.g., "No exits detected")
  * @property onRetry Callback to retry the scan
+ * @property onDismiss Callback to dismiss and return to camera
  */
 @Composable
 fun NoDetectionsOverlay(
     message: String,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
+    onDismiss: () -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -676,13 +734,25 @@ fun NoDetectionsOverlay(
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                Button(
-                    onClick = onRetry,
-                    modifier = Modifier.fillMaxWidth()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(Icons.Default.CameraAlt, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Scan Again")
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                    ) {
+                        Text("Dismiss")
+                    }
+                    Button(
+                        onClick = onRetry,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(Icons.Default.CameraAlt, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Retry")
+                    }
                 }
             }
         }

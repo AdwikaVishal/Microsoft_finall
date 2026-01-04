@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.R
 import com.example.myapplication.ViewModelFactory
 import com.example.myapplication.accessibility.AccessibilityManager
 import com.example.myapplication.model.AbilityType
@@ -38,9 +40,11 @@ fun OnboardingScreen(
     onOnboardingComplete: () -> Unit,
     accessibilityManager: AccessibilityManager? = null
 ) {
-    var selectedAbilityType by remember { mutableStateOf(AbilityType.NORMAL) }
-    var selectedLanguage by remember { mutableStateOf("English") }
+    val context = LocalContext.current
+    var selectedAbilityType by remember { mutableStateOf(AbilityType.NONE) }
+    var selectedLanguage by remember { mutableStateOf("en") }
     var currentStep by remember { mutableStateOf(0) }
+    var recompositionTrigger by remember { mutableStateOf(0) }
     
     val uiTranslations by viewModel.uiTranslations.collectAsState()
     
@@ -101,8 +105,8 @@ fun OnboardingScreen(
         ) {
             Icon(
                 imageVector = when (currentStep) {
-                    0 -> Icons.Default.Accessibility
-                    else -> Icons.Default.Language
+                    0 -> Icons.Default.Language
+                    else -> Icons.Default.Accessibility
                 },
                 contentDescription = null,
                 modifier = Modifier.size(50.dp),
@@ -115,8 +119,8 @@ fun OnboardingScreen(
         // Title
         Text(
             text = when (currentStep) {
-                0 -> uiTranslations["Choose Your Ability Profile"] ?: "Choose Your Ability Profile"
-                else -> uiTranslations["Select Your Language"] ?: "Select Your Language"
+                0 -> uiTranslations["Select Your Language"] ?: "Select Your Language"
+                else -> uiTranslations["Choose Your Ability Profile"] ?: "Choose Your Ability Profile"
             },
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
@@ -129,8 +133,8 @@ fun OnboardingScreen(
         // Subtitle
         Text(
             text = when (currentStep) {
-                0 -> uiTranslations["This helps us customize alerts and guidance for your needs"] ?: "This helps us customize alerts and guidance for your needs"
-                else -> uiTranslations["We'll use this for voice announcements"] ?: "We'll use this for voice announcements"
+                0 -> uiTranslations["We'll use this for voice announcements"] ?: "We'll use this for voice announcements"
+                else -> uiTranslations["This helps us customize alerts and guidance for your needs"] ?: "This helps us customize alerts and guidance for your needs"
             },
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
@@ -140,6 +144,41 @@ fun OnboardingScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         if (currentStep == 0) {
+            // Language Selection
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                val languages = listOf(
+                    "en" to "English",
+                    "es" to "Español", 
+                    "fr" to "Français",
+                    "de" to "Deutsch",
+                    "zh-rCN" to "中文 (简体)",
+                    "ja" to "日本語"
+                )
+                languages.forEach { (code, name) ->
+                    LanguageCard(
+                        language = name,
+                        isSelected = selectedLanguage == code,
+                        onClick = {
+                            selectedLanguage = code
+                            // Apply language immediately
+                            val prefs = context.getSharedPreferences("lang_prefs", android.content.Context.MODE_PRIVATE)
+                            prefs.edit().putString("LANG", code).apply()
+                            
+                            // Apply locale immediately to current context
+                            com.example.myapplication.utils.LocaleUtils.updateLocale(context, code)
+                            
+                            // Trigger recomposition
+                            recompositionTrigger++
+                            
+                            accessibilityManager?.vibrate(AccessibilityManager.PATTERN_CONFIRM)
+                            accessibilityManager?.speak("$name selected")
+                        }
+                    )
+                }
+            }
+        } else {
             // Ability Type Selection
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -152,24 +191,6 @@ fun OnboardingScreen(
                             selectedAbilityType = abilityType
                             accessibilityManager?.vibrate(AccessibilityManager.PATTERN_CONFIRM)
                             accessibilityManager?.speak("${abilityType.name} selected")
-                        }
-                    )
-                }
-            }
-        } else {
-            // Language Selection
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                val languages = listOf("English", "Spanish", "French", "German", "Chinese", "Japanese")
-                languages.forEach { language ->
-                    LanguageCard(
-                        language = language,
-                        isSelected = selectedLanguage == language,
-                        onClick = {
-                            selectedLanguage = language
-                            accessibilityManager?.vibrate(AccessibilityManager.PATTERN_CONFIRM)
-                            accessibilityManager?.speak("$language selected")
                         }
                     )
                 }
@@ -248,6 +269,27 @@ fun AbilityTypeCard(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val description = when (abilityType) {
+        AbilityType.NONE -> stringResource(R.string.ability_none)
+        AbilityType.BLIND -> stringResource(R.string.ability_blind)
+        AbilityType.LOW_VISION -> stringResource(R.string.ability_low_vision)
+        AbilityType.DEAF -> stringResource(R.string.ability_deaf)
+        AbilityType.HARD_OF_HEARING -> stringResource(R.string.ability_hard_of_hearing)
+        AbilityType.NON_VERBAL -> stringResource(R.string.ability_non_verbal)
+        AbilityType.ELDERLY -> stringResource(R.string.ability_elderly)
+        AbilityType.OTHER -> stringResource(R.string.ability_other)
+    }
+    
+    val displayName = when (abilityType) {
+        AbilityType.NONE -> stringResource(R.string.ability_name_none)
+        AbilityType.BLIND -> stringResource(R.string.ability_name_blind)
+        AbilityType.LOW_VISION -> stringResource(R.string.ability_name_low_vision)
+        AbilityType.DEAF -> stringResource(R.string.ability_name_deaf)
+        AbilityType.HARD_OF_HEARING -> stringResource(R.string.ability_name_hard_of_hearing)
+        AbilityType.NON_VERBAL -> stringResource(R.string.ability_name_non_verbal)
+        AbilityType.ELDERLY -> stringResource(R.string.ability_name_elderly)
+        AbilityType.OTHER -> stringResource(R.string.ability_name_other)
+    }
     Card(
         onClick = onClick,
         modifier = Modifier
@@ -289,12 +331,12 @@ fun AbilityTypeCard(
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = abilityType.name.replace("_", " "),
+                    text = displayName,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = getAbilityDescription(abilityType),
+                    text = description,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -362,24 +404,13 @@ fun LanguageCard(
 
 private fun getAbilityIcon(abilityType: AbilityType): ImageVector {
     return when (abilityType) {
-        AbilityType.NORMAL -> Icons.Default.Person
+        AbilityType.NONE -> Icons.Default.Person
         AbilityType.BLIND -> Icons.Default.VisibilityOff
         AbilityType.LOW_VISION -> Icons.Default.RemoveRedEye
         AbilityType.DEAF -> Icons.Default.VolumeOff
         AbilityType.HARD_OF_HEARING -> Icons.Default.VolumeUp
         AbilityType.NON_VERBAL -> Icons.Default.MicOff
         AbilityType.ELDERLY -> Icons.Default.AccessibleForward
-    }
-}
-
-private fun getAbilityDescription(abilityType: AbilityType): String {
-    return when (abilityType) {
-        AbilityType.NORMAL -> "Standard accessibility settings"
-        AbilityType.BLIND -> "Enhanced audio and haptic feedback"
-        AbilityType.LOW_VISION -> "Larger text and high contrast"
-        AbilityType.DEAF -> "Visual and vibration alerts"
-        AbilityType.HARD_OF_HEARING -> "Amplified audio and visual cues"
-        AbilityType.NON_VERBAL -> "Simplified buttons and gestures"
-        AbilityType.ELDERLY -> "Larger text and clearer interface"
+        AbilityType.OTHER -> Icons.Default.MoreHoriz
     }
 }

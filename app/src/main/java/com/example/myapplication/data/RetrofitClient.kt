@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 object RetrofitClient {
     // Your Mac's IP address for physical device testing
-private const val BASE_URL = "http://10.211.52.92:8000"
+private const val BASE_URL = "http://192.168.0.130:8000"
 
     val instance: RescueService by lazy {
         Retrofit.Builder()

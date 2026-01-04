@@ -1,5 +1,6 @@
 package com.example.myapplication.network
 
+import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -9,7 +10,7 @@ import java.util.concurrent.TimeUnit
 object RetrofitClient {
     // TODO: Move base URL to Azure once deployed
     // Use 10.0.2.2 for Android Emulator to access localhost
-    private const val BASE_URL = "http://10.211.52.92:8000"
+    private const val BASE_URL = "http://192.168.0.130:8000"
     
     // Demo/test credentials for development
     const val DEMO_EMAIL = "demo@sensesafe.app"
@@ -46,10 +47,16 @@ object RetrofitClient {
             .writeTimeout(30, TimeUnit.SECONDS)
             .build()
 
+        // Configure Gson to handle ISO 8601 date format
+        val gson = GsonBuilder()
+            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+            .setLenient()
+            .create()
+
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
         retrofit.create(ApiService::class.java)
     }

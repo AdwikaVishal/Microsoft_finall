@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SenseSafe</string>
+    
+    <!-- Mapbox Access Token -->
+    <string name="mapbox_access_token" translatable="false">pk.eyJ1Ijoic2hhbnRhbnUzMCIsImEiOiJjbWp5Z2ozMWEzdHgyM2VzZXl3dGN1b2FjIn0.J1WKzn7Bu4EezdfBphdgEg</string>
+
+    <!-- Home Screen -->
+    <string name="simulate_disaster_alert">模拟灾难警报</string>
+    <string name="scan_surroundings">扫描周围环境（出口）</string>
+    <string name="start_voice_command">启动语音命令</string>
+    <string name="reset_app">重置应用（清除用户数据）</string>
+
+    <!-- Onboarding Screen -->
+    <string name="select_your_profile">选择您的档案</string>
+    <string name="continue_button">继续</string>
+    <string name="continue_to_main_app">继续到主应用</string>
+
+    <!-- Voice Command Screen -->
+    <string name="voice_command">语音命令</string>
+    <string name="close">关闭</string>
+    <string name="grant_microphone_permission">授予麦克风权限</string>
+    <string name="stop_listening">停止监听</string>
+    <string name="start_listening">开始监听</string>
+    <string name="tap_to_grant_permission">点击授予麦克风权限</string>
+    <string name="listening_say_command">正在监听...请说出命令</string>
+    <string name="processing">处理中...</string>
+    <string name="tap_to_speak">点击说话</string>
+    <string name="heard">听到：</string>
+    <string name="microphone_permission_required">需要麦克风权限</string>
+    <string name="permission_rationale">需要麦克风权限来听取您的语音命令。请授予权限以使用语音命令。</string>
+    <string name="permission_request">请授予麦克风权限以启用语音命令。</string>
+    <string name="supported_commands">支持的命令</string>
+    <string name="speech_not_available">此设备不支持语音识别</string>
+    <string name="ready_for_voice_command">准备接收语音命令</string>
+    <string name="listening">正在监听...</string>
+    <string name="processing_speech">处理语音中...</string>
+    <string name="error_occurred">发生错误</string>
+    <string name="command_not_recognized">命令未识别。请重试。</string>
+
+    <!-- Voice Commands -->
+    <string name="cmd_open_scan">"打开扫描"</string>
+    <string name="cmd_open_scan_desc">导航到扫描屏幕</string>
+    <string name="cmd_send_sos">"发送求救"</string>
+    <string name="cmd_send_sos_desc">触发紧急求救</string>
+    <string name="cmd_show_alerts">"显示警报"</string>
+    <string name="cmd_show_alerts_desc">查看活动警报</string>
+    <string name="cmd_back_home">"返回主页"</string>
+    <string name="cmd_back_home_desc">返回主屏幕</string>
+    <string name="cmd_send_incident">"发送事件 [描述]"</string>
+    <string name="cmd_send_incident_desc">通过语音报告事件</string>
+    
+    <!-- SOS Screen -->
+    <string name="sos_screen">求救屏幕</string>
+    
+    <!-- Status Screen -->
+    <string name="status_screen">状态屏幕</string>
+    
+    <!-- General -->
+    <string name="welcome_message">欢迎使用SenseSafe。您的安全应用已准备就绪。</string>
+    <string name="welcome_user">欢迎，%1$s</string>
+    <string name="emergency_alert">紧急警报</string>
+    <string name="incident_reported">事件已报告</string>
+    <string name="location_tracking">位置跟踪</string>
+    <string name="settings">设置</string>
+    <string name="language">语言</string>
+    <string name="english">English</string>
+    <string name="spanish">Español</string>
+    <string name="french">Français</string>
+    <string name="german">Deutsch</string>
+    <string name="chinese_simplified">中文 (简体)</string>
+    <string name="japanese">日本語</string>
+
+    <!-- Main Screen & Dialogs -->
+    <string name="test_alert_dev">测试警报（开发）</string>
+    <string name="cancel">取消</string>
+    <string name="sending_sos">发送求救中</string>
+    <string name="stay_calm_help_coming">请保持冷静。救援正在路上。</string>
+    <string name="sos_sent_successfully">求救发送成功</string>
+    <string name="sos_sent_to_responders">您的求救信号已发送给应急响应人员。</string>
+    <string name="sos_failed">求救发送失败</string>
+    <string name="ok">确定</string>
+    <string name="scan_completed">扫描成功完成</string>
+    <string name="scan_again">重新扫描</string>
+
+    <!-- Main Screen -->
+    <string name="quick_actions">快速操作</string>
+    <string name="scan_area">扫描区域</string>
+    <string name="detect_exits_hazards">检测出口和危险</string>
+    <string name="speak_for_help">说话求助</string>
+    <string name="your_status">您的状态</string>
+    <string name="active_alerts">活动警报</string>
+    <string name="alert_active">警报激活</string>
+    <string name="no_active_alerts">无活动警报</string>
+    <string name="sos_status">求救状态</string>
+    <string name="ready">就绪</string>
+    <string name="sending">发送中...</string>
+    <string name="sent">已发送</string>
+    <string name="failed">失败</string>
+    <string name="features">功能</string>
+    <string name="incident_timeline">事件时间线</string>
+    <string name="view_reported_incidents">查看您报告的事件</string>
+    <string name="report_incident">报告事件</string>
+    <string name="report_new_incident">报告新事件</string>
+    <string name="track_location">跟踪位置</string>
+    <string name="share_location_responders">与救援人员分享您的位置</string>
+    <string name="send_sos">发送求救</string>
+    <string name="select_current_status">选择您当前的状态：</string>
+    <string name="exit_detection_complete">出口检测完成</string>
+
+    <!-- Camera Screen -->
+    <string name="grant_permission">授予权限</string>
+    <string name="go_back">返回</string>
+    <string name="dismiss">忽略</string>
+    <string name="retry">重试</string>
+    <string name="done">完成</string>
+    <string name="failed_to_process_image">图像处理失败</string>
+    <string name="error_processing_image">图像处理错误：%1$s</string>
+    <string name="failed_to_capture_image">图像捕获失败</string>
+
+    <!-- Report Incident Screen -->
+    <string name="select_category">选择类别</string>
+    <string name="choose_incident_type">选择事件类型</string>
+    <string name="describe_incident">描述事件</string>
+    <string name="provide_details">提供发生事情的详细信息...</string>
+    <string name="enable_location">启用位置</string>
+
+    <!-- Track Location Screen -->
+    <string name="open_settings">打开设置</string>
+    <string name="gps_settings">GPS设置</string>
+
+    <!-- Timeline Screen -->
+    <string name="loading_incidents">加载事件中...</string>
+
+    <!-- Guidance Screen -->
+    <string name="guidance_screen">指导屏幕</string>
+    
+    <!-- Ability Profiles -->
+    <string name="ability_blind">增强的音频和触觉反馈</string>
+    <string name="ability_low_vision">更大的文本和高对比度</string>
+    <string name="ability_deaf">视觉和振动警报</string>
+    <string name="ability_hard_of_hearing">放大的音频和视觉提示</string>
+    <string name="ability_non_verbal">简化的按钮和手势</string>
+    <string name="ability_elderly">更大的文本和更清晰的界面</string>
+    <string name="ability_other">自定义辅助功能设置</string>
+    <string name="ability_none">标准辅助功能设置</string>
+    
+    <!-- Ability Names -->
+    <string name="ability_name_blind">盲人</string>
+    <string name="ability_name_low_vision">低视力</string>
+    <string name="ability_name_deaf">聋人</string>
+    <string name="ability_name_hard_of_hearing">听力困难</string>
+    <string name="ability_name_non_verbal">非言语</string>
+    <string name="ability_name_elderly">老年人</string>
+    <string name="ability_name_other">其他</string>
+    <string name="ability_name_none">无</string>
+</resources>

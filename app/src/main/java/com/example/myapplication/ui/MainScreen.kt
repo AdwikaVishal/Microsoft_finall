@@ -17,10 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
 import com.example.myapplication.accessibility.AccessibilityManager
 import com.example.myapplication.model.SOSStatus
 import com.example.myapplication.viewmodel.AlertViewModel
@@ -36,16 +38,30 @@ fun MainScreen(
     onNavigateToCamera: () -> Unit,
     onNavigateToVoiceCommand: () -> Unit,
     onNavigateToReportIncident: () -> Unit,
-    accessibilityManager: AccessibilityManager? = null
+    onNavigateToTrackLocation: () -> Unit,
+    onNavigateToLanguageSettings: () -> Unit = {},
+    accessibilityManager: AccessibilityManager? = null,
+    initialScanResult: String? = null
 ) {
     val sosState by sosViewModel.sosState.collectAsState()
     var showSosDialog by remember { mutableStateOf(false) }
     var showConfirmationDialog by remember { mutableStateOf(false) }
+    
+    // ✅ FIX: Handle scan result from navigation
+    var scanResult by remember { mutableStateOf(initialScanResult) }
+    var showScanResultDialog by remember { mutableStateOf(initialScanResult != null) }
 
     // Trigger vibration feedback when SOS dialog opens
     LaunchedEffect(showSosDialog) {
         if (showSosDialog) {
             accessibilityManager?.vibrate(AccessibilityManager.PATTERN_CONFIRM)
+        }
+    }
+    
+    // ✅ FIX: Announce scan result when available
+    LaunchedEffect(initialScanResult) {
+        if (initialScanResult != null) {
+            accessibilityManager?.speak(initialScanResult)
         }
     }
 
@@ -63,7 +79,10 @@ fun MainScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 actions = {
-                    IconButton(onClick = { /* Open settings */ }) {
+                    IconButton(onClick = { 
+                        // Navigate to language settings
+                        onNavigateToLanguageSettings()
+                    }) {
                         Icon(Icons.Default.Settings, contentDescription = "Settings")
                     }
                 }
@@ -106,7 +125,7 @@ fun MainScreen(
         ) {
             // Quick Actions Section
             Text(
-                text = "Quick Actions",
+                text = stringResource(R.string.quick_actions),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
@@ -120,8 +139,8 @@ fun MainScreen(
             ) {
                 QuickActionCard(
                     icon = Icons.Default.CameraAlt,
-                    title = "Scan Area",
-                    description = "Detect exits & hazards",
+                    title = stringResource(R.string.scan_area),
+                    description = stringResource(R.string.detect_exits_hazards),
                     onClick = { 
                         accessibilityManager?.vibrate(AccessibilityManager.PATTERN_CONFIRM)
                         accessibilityManager?.speak("Opening camera to scan surroundings")
@@ -133,8 +152,8 @@ fun MainScreen(
 
                 QuickActionCard(
                     icon = Icons.Default.RecordVoiceOver,
-                    title = "Voice Command",
-                    description = "Speak for help",
+                    title = stringResource(R.string.voice_command),
+                    description = stringResource(R.string.speak_for_help),
                     onClick = { 
                         accessibilityManager?.vibrate(AccessibilityManager.PATTERN_CONFIRM)
                         accessibilityManager?.speak("Opening voice command")
@@ -149,7 +168,7 @@ fun MainScreen(
 
             // Status Section
             Text(
-                text = "Your Status",
+                text = stringResource(R.string.your_status),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
@@ -158,8 +177,8 @@ fun MainScreen(
             )
 
             StatusCard(
-                title = "Active Alerts",
-                status = if (alertViewModel.hasActiveAlert()) "Alert Active" else "No Active Alerts",
+                title = stringResource(R.string.active_alerts),
+                status = if (alertViewModel.hasActiveAlert()) stringResource(R.string.alert_active) else stringResource(R.string.no_active_alerts),
                 icon = if (alertViewModel.hasActiveAlert()) Icons.Default.Notifications else Icons.Default.CheckCircle,
                 statusColor = if (alertViewModel.hasActiveAlert()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
             )
@@ -167,12 +186,12 @@ fun MainScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             StatusCard(
-                title = "SOS Status",
+                title = stringResource(R.string.sos_status),
                 status = when (sosState) {
-                    is SOSState.Idle -> "Ready"
-                    is SOSState.Loading -> "Sending..."
-                    is SOSState.Success -> "Sent"
-                    is SOSState.Error -> "Failed"
+                    is SOSState.Idle -> stringResource(R.string.ready)
+                    is SOSState.Loading -> stringResource(R.string.sending)
+                    is SOSState.Success -> stringResource(R.string.sent)
+                    is SOSState.Error -> stringResource(R.string.failed)
                 },
                 icon = when (sosState) {
                     is SOSState.Idle -> Icons.Default.Shield
@@ -191,7 +210,7 @@ fun MainScreen(
 
             // Navigation Cards
             Text(
-                text = "Features",
+                text = stringResource(R.string.features),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
@@ -201,8 +220,8 @@ fun MainScreen(
 
             FeatureCard(
                 icon = Icons.AutoMirrored.Filled.List,
-                title = "Incident Timeline",
-                description = "View your reported incidents",
+                title = stringResource(R.string.incident_timeline),
+                description = stringResource(R.string.view_reported_incidents),
                 onClick = {
                     accessibilityManager?.vibrate(AccessibilityManager.PATTERN_CONFIRM)
                     accessibilityManager?.speak("Opening incident timeline")
@@ -214,8 +233,8 @@ fun MainScreen(
 
             FeatureCard(
                 icon = Icons.Default.Description,
-                title = "Report Incident",
-                description = "Report a new incident",
+                title = stringResource(R.string.report_incident),
+                description = stringResource(R.string.report_new_incident),
                 onClick = {
                     accessibilityManager?.vibrate(AccessibilityManager.PATTERN_CONFIRM)
                     accessibilityManager?.speak("Opening incident report")
@@ -227,11 +246,12 @@ fun MainScreen(
 
             FeatureCard(
                 icon = Icons.Default.LocationOn,
-                title = "Track Location",
-                description = "Share your location with responders",
+                title = stringResource(R.string.track_location),
+                description = stringResource(R.string.share_location_responders),
                 onClick = {
                     accessibilityManager?.vibrate(AccessibilityManager.PATTERN_CONFIRM)
-                    accessibilityManager?.speak("Location tracking enabled")
+                    accessibilityManager?.speak("Opening location tracker")
+                    onNavigateToTrackLocation()
                 }
             )
 
@@ -249,7 +269,7 @@ fun MainScreen(
             ) {
                 Icon(Icons.Default.BugReport, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Test Alert (Dev)")
+                Text(stringResource(R.string.test_alert_dev))
             }
         }
     }
@@ -268,7 +288,7 @@ fun MainScreen(
             },
             title = {
                 Text(
-                    text = "Send SOS",
+                    text = stringResource(R.string.send_sos),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
@@ -279,7 +299,7 @@ fun MainScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Select your current status:",
+                        text = stringResource(R.string.select_current_status),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -315,7 +335,7 @@ fun MainScreen(
                     showSosDialog = false
                     accessibilityManager?.speak("SOS cancelled")
                 }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -327,7 +347,7 @@ fun MainScreen(
             is SOSState.Loading -> {
                 AlertDialog(
                     onDismissRequest = { showConfirmationDialog = false },
-                    title = { Text("Sending SOS") },
+                    title = { Text(stringResource(R.string.sending_sos)) },
                     text = {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -335,7 +355,7 @@ fun MainScreen(
                         ) {
                             CircularProgressIndicator()
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text("Please stay calm. Help is on the way.")
+                            Text(stringResource(R.string.stay_calm_help_coming))
                         }
                     },
                     confirmButton = {}
@@ -355,10 +375,10 @@ fun MainScreen(
                             modifier = Modifier.size(48.dp)
                         )
                     },
-                    title = { Text("SOS Sent Successfully") },
+                    title = { Text(stringResource(R.string.sos_sent_successfully)) },
                     text = {
                         Column {
-                            Text("Your SOS has been sent to emergency responders.")
+                            Text(stringResource(R.string.sos_sent_to_responders))
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "SOS ID: ${(sosState as SOSState.Success).sosId}",
@@ -373,7 +393,7 @@ fun MainScreen(
                             sosViewModel.resetState() // Reset state to allow new SOS requests
                             accessibilityManager?.speak("SOS confirmation closed")
                         }) {
-                            Text("OK")
+                            Text(stringResource(R.string.ok))
                         }
                     }
                 )
@@ -392,20 +412,66 @@ fun MainScreen(
                             modifier = Modifier.size(48.dp)
                         )
                     },
-                    title = { Text("SOS Failed") },
+                    title = { Text(stringResource(R.string.sos_failed)) },
                     text = { Text((sosState as SOSState.Error).message) },
                     confirmButton = {
                         TextButton(onClick = { 
                             showConfirmationDialog = false
                             sosViewModel.resetState() // Reset state to allow new SOS requests
                         }) {
-                            Text("OK")
+                            Text(stringResource(R.string.ok))
                         }
                     }
                 )
             }
             else -> {}
         }
+    }
+    
+    // ✅ FIX: Scan Result Dialog
+    if (showScanResultDialog && scanResult != null) {
+        AlertDialog(
+            onDismissRequest = { 
+                showScanResultDialog = false
+                scanResult = null
+            },
+            icon = {
+                Icon(
+                    Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(48.dp)
+                )
+            },
+            title = { 
+                Text(
+                    text = stringResource(R.string.exit_detection_complete),
+                    fontWeight = FontWeight.Bold
+                ) 
+            },
+            text = { 
+                Text(scanResult ?: stringResource(R.string.scan_completed)) 
+            },
+            confirmButton = {
+                TextButton(onClick = { 
+                    showScanResultDialog = false
+                    scanResult = null
+                    accessibilityManager?.speak("Scan result dismissed")
+                }) {
+                    Text(stringResource(R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { 
+                    showScanResultDialog = false
+                    scanResult = null
+                    onNavigateToCamera() // Scan again
+                    accessibilityManager?.speak("Opening camera to scan again")
+                }) {
+                    Text(stringResource(R.string.scan_again))
+                }
+            }
+        )
     }
 }
 

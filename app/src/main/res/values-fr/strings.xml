@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SenseSafe</string>
+    
+    <!-- Mapbox Access Token -->
+    <string name="mapbox_access_token" translatable="false">pk.eyJ1Ijoic2hhbnRhbnUzMCIsImEiOiJjbWp5Z2ozMWEzdHgyM2VzZXl3dGN1b2FjIn0.J1WKzn7Bu4EezdfBphdgEg</string>
+
+    <!-- Home Screen -->
+    <string name="simulate_disaster_alert">SIMULER ALERTE DE CATASTROPHE</string>
+    <string name="scan_surroundings">SCANNER LES ENVIRONS (SORTIE)</string>
+    <string name="start_voice_command">DEMARRER COMMANDE VOCALE</string>
+    <string name="reset_app">REINITIALISER APP (EFFACER DONNEES UTILISATEUR)</string>
+
+    <!-- Onboarding Screen -->
+    <string name="select_your_profile">Selectionnez votre profil</string>
+    <string name="continue_button">Continuer</string>
+    <string name="continue_to_main_app">Continuer vers application principale</string>
+
+    <!-- Voice Command Screen -->
+    <string name="voice_command">Commande Vocale</string>
+    <string name="close">Fermer</string>
+    <string name="grant_microphone_permission">Accorder permission microphone</string>
+    <string name="stop_listening">Arreter ecouter</string>
+    <string name="start_listening">Commencer a ecouter</string>
+    <string name="tap_to_grant_permission">Appuyez pour accorder permission microphone</string>
+    <string name="listening_say_command">Ecoute... Dites une commande</string>
+    <string name="processing">Traitement...</string>
+    <string name="tap_to_speak">Appuyez pour parler</string>
+    <string name="heard">Entendu :</string>
+    <string name="microphone_permission_required">Permission Microphone Requise</string>
+    <string name="permission_rationale">La permission microphone est necessaire pour ecouter vos commandes vocales. Veuillez accorder la permission pour utiliser les commandes vocales.</string>
+    <string name="permission_request">Veuillez accorder la permission microphone pour activer les commandes vocales.</string>
+    <string name="supported_commands">Commandes Supportees</string>
+    <string name="speech_not_available">La reconnaissance vocale nest pas disponible sur cet appareil</string>
+    <string name="ready_for_voice_command">Pret pour commande vocale</string>
+    <string name="listening">Ecoute...</string>
+    <string name="processing_speech">Traitement de la parole...</string>
+    <string name="error_occurred">Une erreur sest produite</string>
+    <string name="command_not_recognized">Commande non reconnue. Reessayez.</string>
+
+    <!-- Voice Commands -->
+    <string name="cmd_open_scan">"ouvrir scan"</string>
+    <string name="cmd_open_scan_desc">Naviguer vers ecran de scan</string>
+    <string name="cmd_send_sos">"envoyer sos"</string>
+    <string name="cmd_send_sos_desc">Declencher SOS urgence</string>
+    <string name="cmd_show_alerts">"afficher alertes"</string>
+    <string name="cmd_show_alerts_desc">Voir les alertes actives</string>
+    <string name="cmd_back_home">"retour accueil"</string>
+    <string name="cmd_back_home_desc">Retourner a ecran principal</string>
+    <string name="cmd_send_incident">"envoyer incident [description]"</string>
+    <string name="cmd_send_incident_desc">Signaler incident par voix</string>
+    
+    <!-- SOS Screen -->
+    <string name="sos_screen">Ecran SOS</string>
+    
+    <!-- Status Screen -->
+    <string name="status_screen">Ecran de Statut</string>
+    
+    <!-- General -->
+    <string name="welcome_message">Bienvenue sur SenseSafe. Votre application de securite est prete.</string>
+    <string name="welcome_user">Bienvenue, %1$s</string>
+    <string name="emergency_alert">Alerte Urgence</string>
+    <string name="incident_reported">Incident Signale</string>
+    <string name="location_tracking">Suivi de Localisation</string>
+    <string name="settings">Parametres</string>
+    <string name="language">Langue</string>
+    <string name="english">English</string>
+    <string name="spanish">Español</string>
+    <string name="french">Français</string>
+    <string name="german">Deutsch</string>
+    <string name="chinese_simplified">中文 (简体)</string>
+    <string name="japanese">日本語</string>
+
+    <!-- Main Screen & Dialogs -->
+    <string name="test_alert_dev">Alerte Test (Dev)</string>
+    <string name="cancel">Annuler</string>
+    <string name="sending_sos">Envoi SOS</string>
+    <string name="stay_calm_help_coming">Veuillez rester calme. Aide arrive.</string>
+    <string name="sos_sent_successfully">SOS Envoye avec Succes</string>
+    <string name="sos_sent_to_responders">Votre SOS a ete envoye aux services urgence.</string>
+    <string name="sos_failed">SOS Echoue</string>
+    <string name="ok">OK</string>
+    <string name="scan_completed">Scan termine avec succes</string>
+    <string name="scan_again">Scanner a Nouveau</string>
+
+    <!-- Main Screen -->
+    <string name="quick_actions">Actions Rapides</string>
+    <string name="scan_area">Zone de Scan</string>
+    <string name="detect_exits_hazards">Detecter sorties et dangers</string>
+    <string name="speak_for_help">Parlez pour obtenir aide</string>
+    <string name="your_status">Votre Statut</string>
+    <string name="active_alerts">Alertes Actives</string>
+    <string name="alert_active">Alerte Active</string>
+    <string name="no_active_alerts">Aucune Alerte Active</string>
+    <string name="sos_status">Statut SOS</string>
+    <string name="ready">Pret</string>
+    <string name="sending">Envoi...</string>
+    <string name="sent">Envoye</string>
+    <string name="failed">Echoue</string>
+    <string name="features">Fonctionnalites</string>
+    <string name="incident_timeline">Chronologie des Incidents</string>
+    <string name="view_reported_incidents">Voir vos incidents signales</string>
+    <string name="report_incident">Signaler Incident</string>
+    <string name="report_new_incident">Signaler un nouvel incident</string>
+    <string name="track_location">Suivre Localisation</string>
+    <string name="share_location_responders">Partagez votre localisation avec les secours</string>
+    <string name="send_sos">Envoyer SOS</string>
+    <string name="select_current_status">Selectionnez votre statut actuel :</string>
+    <string name="exit_detection_complete">Detection de Sortie Terminee</string>
+
+    <!-- Camera Screen -->
+    <string name="grant_permission">Accorder Permission</string>
+    <string name="go_back">Retour</string>
+    <string name="dismiss">Ignorer</string>
+    <string name="retry">Reessayer</string>
+    <string name="done">Termine</string>
+    <string name="failed_to_process_image">Echec du traitement de image</string>
+    <string name="error_processing_image">Erreur traitement image : %1$s</string>
+    <string name="failed_to_capture_image">Echec de capture image</string>
+
+    <!-- Report Incident Screen -->
+    <string name="select_category">Selectionner categorie</string>
+    <string name="choose_incident_type">Choisir type incident</string>
+    <string name="describe_incident">Decrire incident</string>
+    <string name="provide_details">Fournissez des details sur ce qui sest passe...</string>
+    <string name="enable_location">Activer Localisation</string>
+
+    <!-- Track Location Screen -->
+    <string name="open_settings">Ouvrir Parametres</string>
+    <string name="gps_settings">Parametres GPS</string>
+
+    <!-- Timeline Screen -->
+    <string name="loading_incidents">Chargement des incidents...</string>
+
+    <!-- Guidance Screen -->
+    <string name="guidance_screen">Ecran de Guidage</string>
+    
+    <!-- Ability Profiles -->
+    <string name="ability_blind">Retour audio et haptique ameliore</string>
+    <string name="ability_low_vision">Texte plus grand et contraste eleve</string>
+    <string name="ability_deaf">Alertes visuelles et vibrations</string>
+    <string name="ability_hard_of_hearing">Audio amplifie et signaux visuels</string>
+    <string name="ability_non_verbal">Boutons et gestes simplifies</string>
+    <string name="ability_elderly">Texte plus grand et interface plus claire</string>
+    <string name="ability_other">Parametres accessibilite personnalises</string>
+    <string name="ability_none">Parametres accessibilite standard</string>
+    
+    <!-- Ability Names -->
+    <string name="ability_name_blind">Aveugle</string>
+    <string name="ability_name_low_vision">Malvoyant</string>
+    <string name="ability_name_deaf">Sourd</string>
+    <string name="ability_name_hard_of_hearing">Malentendant</string>
+    <string name="ability_name_non_verbal">Non-verbal</string>
+    <string name="ability_name_elderly">Personne agee</string>
+    <string name="ability_name_other">Autre</string>
+    <string name="ability_name_none">Aucun</string>
+</resources>

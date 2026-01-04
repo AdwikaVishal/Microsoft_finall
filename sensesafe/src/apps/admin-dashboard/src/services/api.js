@@ -7,7 +7,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'http://10.211.52.92:8000',
+  baseURL: 'http://192.168.0.130:8000',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -380,8 +380,10 @@ export const getAllAlertsForAdmin = async () => {
       apiClient.get('/api/incidents/user')
     ]);
 
-    // Extract const messages = messagesRes.status === 'fulfilled' && messagesRes.value.data?.messages
-       messagesRes.value.data.messages
+    // Extract data from responses
+    const messages = messagesRes.status === 'fulfilled' && messagesRes.value.data?.messages
+      ? messagesRes.value.data.messages
+      : [];
 
     const sosAlerts = sosRes.status === 'fulfilled' && sosRes.value.data?.sos_alerts
       ? sosRes.value.data.sos_alerts

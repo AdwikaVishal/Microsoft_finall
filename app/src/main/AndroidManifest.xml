@@ -19,6 +19,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
+        android:name=".SenseSafeApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -28,7 +29,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
         android:usesCleartextTraffic="true"
+        android:enableOnBackInvokedCallback="true"
         tools:targetApi="28">
+        
+        <!-- Mapbox Access Token (for MapTiler integration) -->
+        <meta-data
+            android:name="com.mapbox.AccessToken"
+            android:value="${MAPBOX_ACCESS_TOKEN}" />
+        
+        <!-- Google Maps API Key (legacy, if needed) -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
         
         <activity
             android:name=".OnboardingActivity"
