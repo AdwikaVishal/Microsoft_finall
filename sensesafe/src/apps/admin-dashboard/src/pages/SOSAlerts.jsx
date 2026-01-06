@@ -12,7 +12,7 @@ import {
   Eye
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getAllSOSAlerts, resolveSOS, getSOSStats } from '../../../../services/api.js';
+import { getAllSOSAlerts, resolveSOS, getSOSStats } from '../services/api.js';
 
 function SOSAlerts() {
   const [sosAlerts, setSOSAlerts] = useState([]);
