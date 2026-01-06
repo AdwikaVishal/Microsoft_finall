@@ -43,7 +43,8 @@ jobs:
 
       # make startup.sh executable (important!)
       - name: Make startup executable
-        run: chmod +x startup.sh || true
+        run: chmod +x ./startup.sh
+
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -58,3 +59,4 @@ jobs:
           app-name: 'sensesafe'
           slot-name: 'Production'
           package: .
+
