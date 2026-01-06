@@ -9,7 +9,7 @@ import {
   resolveIncident,
   deleteMessage,
   resolveAlert
-} from '../../../../services/api.js';
+} from '../services/api.js';
 
 function Alerts() {
 
