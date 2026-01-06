@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, UserPlus, Edit, Trash2 } from 'lucide-react';
-import { getAllUsers } from '../../../../services/api';
+import { getAllUsers } from '../services/api.js';
 
 function Users() {
     const [searchTerm, setSearchTerm] = useState('');
