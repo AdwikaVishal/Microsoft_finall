@@ -18,7 +18,7 @@ jobs:
       - name: Show files (debug)
         run: ls -R
 
-      # upload ONLY backend folder as artifact
+      # Upload ONLY the contents of backend
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
@@ -37,7 +37,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -50,4 +50,4 @@ jobs:
         with:
           app-name: 'sensesafe'
           slot-name: 'Production'
-          package: backend
+          package: .
