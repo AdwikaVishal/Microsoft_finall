@@ -28,16 +28,18 @@ class Settings(BaseSettings):
 
     # CORS
     CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",  # User app
-        "http://localhost:3001",  # Admin dashboard
-        "http://localhost:3002",  # Actual Vite port
-        "http://localhost:5173",  # Vite dev server
-        "http://192.168.0.130:3000",  # User app on network IP
-        "http://192.168.0.130:3001",  # Admin dashboard on network IP
-        "http://192.168.0.130:3002",  # Actual Vite port on network IP
-        # Note: Removed "*" wildcard because allow_credentials=True 
-        # requires specific origins (browser security requirement)
+    # Local dev
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:5173",
+
+    # Backend (API)
+    "https://sensesafe-c9c8bpend7cceeh7.eastasia-01.azurewebsites.net",
+
+    # Frontend (UI)
+    "https://sensesafe-ghhuawctbmcxgnbb.centralindia-01.azurewebsites.net",
     ]
+
 
     class Config:
         env_file = ".env"
